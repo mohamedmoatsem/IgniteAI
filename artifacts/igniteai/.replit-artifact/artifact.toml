@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "IgniteAI"
+version = "1.0.0"
+id = "artifacts/igniteai"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24115
+
+[services.development]
+run = "pnpm --filter @workspace/igniteai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/igniteai", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/igniteai/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24115"
+BASE_PATH = "/"
