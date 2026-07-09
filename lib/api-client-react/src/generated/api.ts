@@ -514,7 +514,12 @@ export const getCreateAssetJobUrl = () => {
  */
 export const createAssetJob = async (assetJobUpload: AssetJobUpload, options?: RequestInit): Promise<AssetJob> => {
     const formData = new FormData();
-formData.append(`file`, assetJobUpload.file);
+if(assetJobUpload.file !== undefined) {
+ formData.append(`file`, assetJobUpload.file);
+ }
+if(assetJobUpload.text !== undefined) {
+ formData.append(`text`, assetJobUpload.text);
+ }
 
   return customFetch<AssetJob>(getCreateAssetJobUrl(),
   {

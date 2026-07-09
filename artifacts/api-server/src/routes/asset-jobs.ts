@@ -63,32 +63,47 @@ router.post(
     });
   },
   async (req, res): Promise<void> => {
-    if (!req.file) {
-      res.status(400).json({ error: "A file upload is required" });
+    const pastedText = typeof req.body?.text === "string" ? req.body.text.trim() : "";
+
+    if (!req.file && !pastedText) {
+      res.status(400).json({
+        error: "Provide either a file upload or pasted text content",
+      });
       return;
     }
 
     let sourceText: string;
-    try {
-      sourceText = extractTextFromFile({
-        buffer: req.file.buffer,
-        filename: req.file.originalname,
-      });
-    } catch (err) {
-      req.log.error({ err }, "Failed to extract text from uploaded file");
-      res.status(400).json({ error: "Could not read the uploaded file" });
-      return;
+    let filename: string;
+
+    // Exactly one of file/text is used to build the job; if both are
+    // present, the file upload takes precedence and the pasted text is
+    // ignored (documented in the OpenAPI spec).
+    if (req.file) {
+      try {
+        sourceText = extractTextFromFile({
+          buffer: req.file.buffer,
+          filename: req.file.originalname,
+        });
+      } catch (err) {
+        req.log.error({ err }, "Failed to extract text from uploaded file");
+        res.status(400).json({ error: "Could not read the uploaded file" });
+        return;
+      }
+      filename = req.file.originalname;
+    } else {
+      sourceText = pastedText;
+      filename = "Pasted content";
     }
 
     if (!sourceText.trim()) {
-      res.status(400).json({ error: "The uploaded file appears to be empty" });
+      res.status(400).json({ error: "The provided content appears to be empty" });
       return;
     }
 
     const [job] = await db
       .insert(assetJobsTable)
       .values({
-        filename: req.file.originalname,
+        filename,
         status: "pending",
         sourceText,
       })

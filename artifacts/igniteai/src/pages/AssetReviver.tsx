@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { UploadCloud, FileText, CheckCircle2, Clock, XCircle, FileArchive, Loader2, Sparkles } from "lucide-react"
+import { UploadCloud, FileText, CheckCircle2, Clock, XCircle, FileArchive, Loader2, Sparkles, PenLine } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
 import { format } from "date-fns"
 import { motion, AnimatePresence } from "framer-motion"
 import ReactMarkdown from "react-markdown"
@@ -14,6 +15,7 @@ import ReactMarkdown from "react-markdown"
 export default function AssetReviver() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [draftText, setDraftText] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const queryClient = useQueryClient()
@@ -54,6 +56,21 @@ export default function AssetReviver() {
         onSuccess: (newJob) => {
           queryClient.invalidateQueries({ queryKey: getListAssetJobsQueryKey() })
           setSelectedJobId(newJob.id)
+        }
+      }
+    )
+  }
+
+  const handleGenerateFromText = () => {
+    const text = draftText.trim()
+    if (!text) return
+    createJob.mutate(
+      { data: { text } },
+      {
+        onSuccess: (newJob) => {
+          queryClient.invalidateQueries({ queryKey: getListAssetJobsQueryKey() })
+          setSelectedJobId(newJob.id)
+          setDraftText("")
         }
       }
     )
@@ -132,6 +149,43 @@ export default function AssetReviver() {
                 {isDragging ? "Drop file to upload" : "Upload file"}
               </div>
               <p className="text-xs text-muted-foreground">Excel (.xlsx/.xls), CSV, or a Notion export (.txt/.md)</p>
+            </div>
+
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs">أو</span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+
+            {/* Direct text entry, as an alternative to a file upload */}
+            <div className="flex flex-col gap-2" dir="rtl">
+              <label htmlFor="draft-text" className="text-sm font-medium text-foreground flex items-center gap-2 justify-end">
+                أو اكتب مسودة المحتوى/البيانات هنا مباشرة
+                <PenLine className="w-4 h-4 text-muted-foreground shrink-0" />
+              </label>
+              <Textarea
+                id="draft-text"
+                value={draftText}
+                onChange={(e) => setDraftText(e.target.value)}
+                disabled={createJob.isPending}
+                dir="auto"
+                rows={5}
+                className="resize-none text-sm"
+                placeholder="اكتب أو الصق المحتوى الخام هنا..."
+              />
+              <Button
+                onClick={handleGenerateFromText}
+                disabled={!draftText.trim() || createJob.isPending}
+                className="w-full"
+                dir="ltr"
+              >
+                {createJob.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+                Generate from text
+              </Button>
             </div>
 
             <div className="w-full h-px bg-border my-2" />

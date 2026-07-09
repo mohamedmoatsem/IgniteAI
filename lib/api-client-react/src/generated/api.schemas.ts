@@ -51,7 +51,9 @@ export interface Explanation {
 }
 
 export interface AssetJobUpload {
-  file: Blob;
+  file?: Blob;
+  /** Raw draft content/data pasted directly by the user, used instead of a file upload. Exactly one of `file` or `text` must be provided and non-empty; if both are provided, `file` takes precedence and `text` is ignored. Omitting both returns a 400. */
+  text?: string;
 }
 
 export type AssetJobStatus = typeof AssetJobStatus[keyof typeof AssetJobStatus];

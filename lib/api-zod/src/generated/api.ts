@@ -126,7 +126,8 @@ export const ListAssetJobsResponse = zod.array(ListAssetJobsResponseItem)
  * @summary Upload a file (Excel or Notion export) and start background processing into marketing content and an e-book
  */
 export const CreateAssetJobBody = zod.object({
-  "file": zod.instanceof(File)
+  "file": zod.instanceof(File).optional(),
+  "text": zod.string().optional().describe('Raw draft content\/data pasted directly by the user, used instead of a file upload. Exactly one of `file` or `text` must be provided and non-empty; if both are provided, `file` takes precedence and `text` is ignored. Omitting both returns a 400.')
 })
 
 export const CreateAssetJobResponse = zod.object({
