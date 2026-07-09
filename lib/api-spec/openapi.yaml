@@ -10,7 +10,190 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: jumpstart
+    description: AI-generated Kanban boards
+  - name: livelab
+    description: Interactive code explanations
+  - name: asset-reviver
+    description: Convert uploaded documents into marketing content and e-books
 paths:
+  /jumpstart/boards:
+    get:
+      operationId: listBoards
+      tags: [jumpstart]
+      summary: List generated boards
+      responses:
+        "200":
+          description: List of boards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Board"
+    post:
+      operationId: createBoard
+      tags: [jumpstart]
+      summary: Generate a Kanban board from a prompt using Gemini
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BoardInput"
+      responses:
+        "201":
+          description: Created board
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Board"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Gemini generation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /jumpstart/boards/{id}:
+    get:
+      operationId: getBoard
+      tags: [jumpstart]
+      summary: Get a board by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Board
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Board"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteBoard
+      tags: [jumpstart]
+      summary: Delete a board
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /livelab/explain:
+    post:
+      operationId: explainCode
+      tags: [livelab]
+      summary: Get an interactive Gemini explanation of a code snippet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExplainCodeInput"
+      responses:
+        "200":
+          description: Explanation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Explanation"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Gemini generation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /assets/jobs:
+    get:
+      operationId: listAssetJobs
+      tags: [asset-reviver]
+      summary: List asset reviver jobs
+      responses:
+        "200":
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssetJob"
+    post:
+      operationId: createAssetJob
+      tags: [asset-reviver]
+      summary: Upload a file (Excel or Notion export) and start background processing into marketing content and an e-book
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AssetJobUpload"
+      responses:
+        "202":
+          description: Job accepted and queued for processing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssetJob"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /assets/jobs/{id}:
+    get:
+      operationId: getAssetJob
+      tags: [asset-reviver]
+      summary: Get an asset reviver job's status and results
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssetJob"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /healthz:
     get:
       operationId: healthCheck
@@ -33,4 +216,103 @@ components:
           type: string
       required:
         - status
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    BoardTask:
+      type: object
+      required: [id, title, description]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+    BoardColumn:
+      type: object
+      required: [id, title, tasks]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/BoardTask"
+    Board:
+      type: object
+      required: [id, prompt, title, columns, createdAt]
+      properties:
+        id:
+          type: integer
+        prompt:
+          type: string
+        title:
+          type: string
+        columns:
+          type: array
+          items:
+            $ref: "#/components/schemas/BoardColumn"
+        createdAt:
+          type: string
+          format: date-time
+    BoardInput:
+      type: object
+      required: [prompt]
+      properties:
+        prompt:
+          type: string
+          minLength: 1
+    ExplainCodeInput:
+      type: object
+      required: [code, language]
+      properties:
+        code:
+          type: string
+          minLength: 1
+        language:
+          type: string
+        question:
+          type: string
+          description: Optional follow-up question about the code; if omitted, a general explanation is generated.
+    Explanation:
+      type: object
+      required: [explanation]
+      properties:
+        explanation:
+          type: string
+    AssetJobUpload:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          format: binary
+    AssetJobStatus:
+      type: string
+      enum: [pending, processing, completed, failed]
+    AssetJob:
+      type: object
+      required: [id, filename, status, createdAt]
+      properties:
+        id:
+          type: integer
+        filename:
+          type: string
+        status:
+          $ref: "#/components/schemas/AssetJobStatus"
+        marketingContent:
+          type: ["string", "null"]
+        ebookContent:
+          type: ["string", "null"]
+        error:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
 
