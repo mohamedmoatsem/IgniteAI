@@ -9,4 +9,6 @@
 export interface BoardInput {
   /** @minLength 1 */
   prompt: string;
+  /** BCP-47-ish language code (en, ar, fr, es, de) the generated task titles/descriptions should be written in. Defaults to English. */
+  language?: string;
 }

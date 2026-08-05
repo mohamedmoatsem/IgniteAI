@@ -9,7 +9,10 @@
 export interface ExplainCodeInput {
   /** @minLength 1 */
   code: string;
-  language: string;
+  /** Programming language of the code snippet (javascript, python, etc.) */
+  programmingLanguage: string;
   /** Optional follow-up question about the code; if omitted, a general explanation is generated. */
   question?: string;
+  /** BCP-47-ish language code (en, ar, fr, es, de) the explanation should be written in. Defaults to English. */
+  uiLanguage?: string;
 }

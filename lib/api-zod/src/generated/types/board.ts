@@ -11,6 +11,8 @@ export interface Board {
   id: number;
   prompt: string;
   title: string;
+  /** Language the board's task titles/descriptions were written in. */
+  language?: string;
   columns: BoardColumn[];
   createdAt: Date;
 }

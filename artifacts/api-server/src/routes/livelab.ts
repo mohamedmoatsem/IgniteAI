@@ -11,11 +11,15 @@ router.post("/livelab/explain", async (req, res): Promise<void> => {
     return;
   }
 
-  const { code, language, question } = parsed.data;
+  const { code, programmingLanguage, question, uiLanguage } = parsed.data;
+
+  const langNote = uiLanguage && uiLanguage !== "en"
+    ? `\n\nIMPORTANT: Write your entire explanation in the language with BCP-47 code "${uiLanguage}".`
+    : "";
 
   const prompt = question
-    ? `Language: ${language}\n\nCode:\n${code}\n\nQuestion about the code above: ${question}`
-    : `Language: ${language}\n\nExplain what the following code does, step by step, in clear prose:\n\n${code}`;
+    ? `Programming language: ${programmingLanguage}\n\nCode:\n${code}\n\nQuestion about the code above: ${question}${langNote}`
+    : `Programming language: ${programmingLanguage}\n\nExplain what the following code does, step by step, in clear prose:\n\n${code}${langNote}`;
 
   try {
     const explanation = await generateText({

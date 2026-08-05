@@ -1,0 +1,27 @@
+Let's fully upgrade IgniteAI into a premium, global multi-lingual production ecosystem and integrate advanced agentic and multimodal features. Please implement the following architecture across the application:
+
+1. Global Language Selector & RTL UI:
+- Replace any single-language logic with a clean global language Dropdown menu in the navigation bar/sidebar.
+- Options must include: Arabic, English, French, Spanish, German, and an 'Auto-Detect' option.
+- Dynamically translate all static UI elements (navigation, buttons, labels, placeholders, and descriptions) across JumpStart, LiveLab, and Asset Reviver based on the selected language.
+- Ensure proper RTL (Right-to-Left) layout alignment and font styling when Arabic is selected.
+
+2. Mobile Responsive Kanban Board (JumpStart Fix):
+- Fix the horizontal scroll issue on mobile viewports for the 5-column Kanban board.
+- On small screens, make the columns stack beautifully in a single-column layout (grid-cols-1) or convert them into a sleek, tab-based view where users can switch between stages smoothly without horizontal scrolling.
+
+3. Background Agentic Execution (JumpStart Upgrade):
+- Add a 'Delegate to Agent' button on individual Kanban task cards.
+- When clicked, trigger a background simulation using Gemini Pro to automatically research, sketch a starting code snippet, or outline a solution for that specific task ticket, moving it seamlessly to a 'Ready for Review' state.
+
+4. Focus Guard & Pomodoro Module (LiveLab Upgrade):
+- Integrate a visual Pomodoro Timer (25 minutes Deep Focus / 5 minutes AI Review) at the top of the LiveLab interface.
+- Implement a subtle, context-aware alert: if a user remains inactive or stuck on the same code fragment for more than 10 minutes, prompt an interactive, simplified breakdown or architectural tip to keep them in flow.
+
+5. Multimodal Visual Assets & Media (Asset Reviver Upgrade):
+- Leverage the latest Gemini Omni Flash and generative media models within the Asset Reviver pipeline.
+- Upgrade the output viewport to render not only marketing text and metadata, but also generate a visual promotional cover/thumbnail sketch for the Gumroad/KDP product.
+- Integrate Mermaid.js rendering so the AI can display visual system architecture diagrams and flowcharts alongside the text-based course slides and metadata formatting.
+- Ensure that the generated book contents, marketing copy, and metadata align strictly with the user's selected language.
+
+Review the existing codebase carefully, ensure clean typechecking, and deploy these updates together smoothly.

@@ -31,8 +31,10 @@ function toApiAssetJob(job: AssetJob) {
     id: job.id,
     filename: job.filename,
     status: job.status,
+    language: job.language,
     marketingContent: job.marketingContent,
     ebookContent: job.ebookContent,
+    coverSvg: job.coverSvg,
     error: job.error,
     createdAt: job.createdAt,
   };
@@ -100,12 +102,18 @@ router.post(
       return;
     }
 
+    const language =
+      typeof req.body?.language === "string" && req.body.language.trim()
+        ? req.body.language.trim()
+        : "en";
+
     const [job] = await db
       .insert(assetJobsTable)
       .values({
         filename,
         status: "pending",
         sourceText,
+        language,
       })
       .returning();
 
@@ -156,9 +164,13 @@ async function processAssetJob(jobId: number): Promise<void> {
     .set({ status: "processing" })
     .where(eq(assetJobsTable.id, jobId));
 
+  const langNote =
+    job.language && job.language !== "en"
+      ? `\n\nIMPORTANT: Write all output text in the language with BCP-47 code "${job.language}".`
+      : "";
+
   try {
-    // Sequential, not parallel: the Gemini free tier allows only a handful
-    // of requests per minute, so two concurrent calls easily trip the limit.
+    // Sequential calls — Gemini free tier allows only a handful per minute.
     const marketingContent = await generateText({
       systemInstruction:
         "You are the marketing copywriter for Asset Reviver, which turns raw source documents into a ready-to-paste Gumroad product listing. Given raw source material extracted from a document, produce a complete Gumroad listing in clean markdown with exactly these sections, in this order:\n\n" +
@@ -169,9 +181,11 @@ async function processAssetJob(jobId: number): Promise<void> {
         "## What's Inside\nA bulleted list of 4-6 concrete selling points / things the buyer will get or learn — specific, not generic.\n\n" +
         "## Who This Is For\nA bulleted list of 2-3 target buyer personas.\n\n" +
         "## Suggested Tags\nA comma-separated list of 5-8 Gumroad discovery tags/keywords.\n\n" +
-        "Do not include any preamble, meta-commentary, or text outside these sections.",
+        "Do not include any preamble, meta-commentary, or text outside these sections." +
+        langNote,
       prompt: job.sourceText,
     });
+
     const ebookContent = await generateText({
       systemInstruction:
         "You are the production editor for Asset Reviver, which restructures raw source documents into e-book metadata and manuscript content formatted for direct use in Amazon KDP. Given raw source material, produce clean markdown with exactly these sections, in this order:\n\n" +
@@ -182,13 +196,27 @@ async function processAssetJob(jobId: number): Promise<void> {
         "## Keywords\nA comma-separated list of exactly 7 KDP backend search keywords/phrases.\n\n" +
         "## Table of Contents\nA numbered list of the chapter titles used below, in order.\n\n" +
         "## Manuscript\nAn Introduction, followed by 3-6 chapters (each as an H3 heading, `### Chapter N: Title`) with well-organized, readable prose expanding on the source material, and a concluding chapter/section that wraps up with a clear takeaway or next step for the reader.\n\n" +
-        "Do not include any preamble, meta-commentary, or text outside these sections.",
+        "Do not include any preamble, meta-commentary, or text outside these sections." +
+        langNote,
       prompt: job.sourceText,
     });
 
+    // Cover SVG — a self-contained, decorative book/product cover sketch
+    const coverSvg = await generateText({
+      systemInstruction:
+        "You are a graphic design agent. Given a product name and tagline, generate a complete, self-contained SVG (viewBox=\"0 0 400 560\") representing a stylish digital product cover. " +
+        "Use a gradient background, bold centered title text, a decorative geometric or abstract motif, and a subtle tagline at the bottom. " +
+        "Return ONLY the raw SVG markup starting with <svg and ending with </svg>. No markdown, no code fences, no explanations.",
+      prompt: marketingContent.split("\n").slice(0, 6).join("\n"),
+    });
+
+    // Sanitize: keep only the <svg…</svg> portion, strip anything else
+    const svgMatch = coverSvg.match(/<svg[\s\S]*<\/svg>/i);
+    const sanitizedSvg = svgMatch ? svgMatch[0] : null;
+
     await db
       .update(assetJobsTable)
-      .set({ status: "completed", marketingContent, ebookContent })
+      .set({ status: "completed", marketingContent, ebookContent, coverSvg: sanitizedSvg })
       .where(eq(assetJobsTable.id, jobId));
   } catch (err) {
     logger.error({ err, jobId }, "Asset reviver job failed");

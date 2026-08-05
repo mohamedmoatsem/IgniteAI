@@ -10,4 +10,6 @@ export interface AssetJobUpload {
   file?: Blob;
   /** Raw draft content/data pasted directly by the user, used instead of a file upload. Exactly one of `file` or `text` must be provided and non-empty; if both are provided, `file` takes precedence and `text` is ignored. Omitting both returns a 400. */
   text?: string;
+  /** BCP-47-ish language code (en, ar, fr, es, de) the generated marketing copy/e-book/cover should be written in. Defaults to English. */
+  language?: string;
 }

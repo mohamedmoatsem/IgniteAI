@@ -6,6 +6,8 @@ export interface BoardTaskJson {
   id: string;
   title: string;
   description: string;
+  /** Notes/snippet produced by delegating this task to the background AI agent. */
+  agentNotes?: string;
 }
 
 export interface BoardColumnJson {
@@ -18,6 +20,7 @@ export const boardsTable = pgTable("boards", {
   id: serial("id").primaryKey(),
   prompt: text("prompt").notNull(),
   title: text("title").notNull(),
+  language: text("language").notNull().default("en"),
   columns: jsonb("columns").$type<BoardColumnJson[]>().notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

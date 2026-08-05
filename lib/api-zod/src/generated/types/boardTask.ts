@@ -10,4 +10,6 @@ export interface BoardTask {
   id: string;
   title: string;
   description: string;
+  /** Research/starting solution produced by delegating this task to the background AI agent. */
+  agentNotes?: string;
 }

@@ -15,13 +15,15 @@ export const ListBoardsResponseItem = zod.object({
   "id": zod.number(),
   "prompt": zod.string(),
   "title": zod.string(),
+  "language": zod.string().optional().describe('Language the board\'s task titles\/descriptions were written in.'),
   "columns": zod.array(zod.object({
   "id": zod.string(),
   "title": zod.string(),
   "tasks": zod.array(zod.object({
   "id": zod.string(),
   "title": zod.string(),
-  "description": zod.string()
+  "description": zod.string(),
+  "agentNotes": zod.string().optional().describe('Research\/starting solution produced by delegating this task to the background AI agent.')
 }))
 })),
   "createdAt": zod.coerce.date()
@@ -36,20 +38,23 @@ export const ListBoardsResponse = zod.array(ListBoardsResponseItem)
 
 
 export const CreateBoardBody = zod.object({
-  "prompt": zod.string().min(1)
+  "prompt": zod.string().min(1),
+  "language": zod.string().optional().describe('BCP-47-ish language code (en, ar, fr, es, de) the generated task titles\/descriptions should be written in. Defaults to English.')
 })
 
 export const CreateBoardResponse = zod.object({
   "id": zod.number(),
   "prompt": zod.string(),
   "title": zod.string(),
+  "language": zod.string().optional().describe('Language the board\'s task titles\/descriptions were written in.'),
   "columns": zod.array(zod.object({
   "id": zod.string(),
   "title": zod.string(),
   "tasks": zod.array(zod.object({
   "id": zod.string(),
   "title": zod.string(),
-  "description": zod.string()
+  "description": zod.string(),
+  "agentNotes": zod.string().optional().describe('Research\/starting solution produced by delegating this task to the background AI agent.')
 }))
 })),
   "createdAt": zod.coerce.date()
@@ -67,13 +72,15 @@ export const GetBoardResponse = zod.object({
   "id": zod.number(),
   "prompt": zod.string(),
   "title": zod.string(),
+  "language": zod.string().optional().describe('Language the board\'s task titles\/descriptions were written in.'),
   "columns": zod.array(zod.object({
   "id": zod.string(),
   "title": zod.string(),
   "tasks": zod.array(zod.object({
   "id": zod.string(),
   "title": zod.string(),
-  "description": zod.string()
+  "description": zod.string(),
+  "agentNotes": zod.string().optional().describe('Research\/starting solution produced by delegating this task to the background AI agent.')
 }))
 })),
   "createdAt": zod.coerce.date()
@@ -91,6 +98,33 @@ export const DeleteBoardResponse = zod.void()
 
 
 /**
+ * @summary Delegate a Kanban task to the background AI agent for research/a starting solution
+ */
+export const DelegateTaskParams = zod.object({
+  "id": zod.coerce.number(),
+  "taskId": zod.coerce.string()
+})
+
+export const DelegateTaskResponse = zod.object({
+  "id": zod.number(),
+  "prompt": zod.string(),
+  "title": zod.string(),
+  "language": zod.string().optional().describe('Language the board\'s task titles\/descriptions were written in.'),
+  "columns": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "tasks": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "agentNotes": zod.string().optional().describe('Research\/starting solution produced by delegating this task to the background AI agent.')
+}))
+})),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
  * @summary Get an interactive Gemini explanation of a code snippet
  */
 
@@ -98,8 +132,9 @@ export const DeleteBoardResponse = zod.void()
 
 export const ExplainCodeBody = zod.object({
   "code": zod.string().min(1),
-  "language": zod.string(),
-  "question": zod.string().optional().describe('Optional follow-up question about the code; if omitted, a general explanation is generated.')
+  "programmingLanguage": zod.string().describe('Programming language of the code snippet (javascript, python, etc.)'),
+  "question": zod.string().optional().describe('Optional follow-up question about the code; if omitted, a general explanation is generated.'),
+  "uiLanguage": zod.string().optional().describe('BCP-47-ish language code (en, ar, fr, es, de) the explanation should be written in. Defaults to English.')
 })
 
 export const ExplainCodeResponse = zod.object({
@@ -116,6 +151,8 @@ export const ListAssetJobsResponseItem = zod.object({
   "status": zod.enum(['pending', 'processing', 'completed', 'failed']),
   "marketingContent": zod.string().nullish(),
   "ebookContent": zod.string().nullish(),
+  "coverSvg": zod.string().nullish().describe('A sanitized, self-contained SVG sketch of a promotional cover\/thumbnail for the asset.'),
+  "language": zod.string().optional().describe('Language the generated content was written in.'),
   "error": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
@@ -127,7 +164,8 @@ export const ListAssetJobsResponse = zod.array(ListAssetJobsResponseItem)
  */
 export const CreateAssetJobBody = zod.object({
   "file": zod.instanceof(File).optional(),
-  "text": zod.string().optional().describe('Raw draft content\/data pasted directly by the user, used instead of a file upload. Exactly one of `file` or `text` must be provided and non-empty; if both are provided, `file` takes precedence and `text` is ignored. Omitting both returns a 400.')
+  "text": zod.string().optional().describe('Raw draft content\/data pasted directly by the user, used instead of a file upload. Exactly one of `file` or `text` must be provided and non-empty; if both are provided, `file` takes precedence and `text` is ignored. Omitting both returns a 400.'),
+  "language": zod.string().optional().describe('BCP-47-ish language code (en, ar, fr, es, de) the generated marketing copy\/e-book\/cover should be written in. Defaults to English.')
 })
 
 export const CreateAssetJobResponse = zod.object({
@@ -136,6 +174,8 @@ export const CreateAssetJobResponse = zod.object({
   "status": zod.enum(['pending', 'processing', 'completed', 'failed']),
   "marketingContent": zod.string().nullish(),
   "ebookContent": zod.string().nullish(),
+  "coverSvg": zod.string().nullish().describe('A sanitized, self-contained SVG sketch of a promotional cover\/thumbnail for the asset.'),
+  "language": zod.string().optional().describe('Language the generated content was written in.'),
   "error": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
@@ -154,9 +194,144 @@ export const GetAssetJobResponse = zod.object({
   "status": zod.enum(['pending', 'processing', 'completed', 'failed']),
   "marketingContent": zod.string().nullish(),
   "ebookContent": zod.string().nullish(),
+  "coverSvg": zod.string().nullish().describe('A sanitized, self-contained SVG sketch of a promotional cover\/thumbnail for the asset.'),
+  "language": zod.string().optional().describe('Language the generated content was written in.'),
   "error": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
+
+
+/**
+ * @summary List uploaded resumes
+ */
+export const ListResumesResponseItem = zod.object({
+  "id": zod.number(),
+  "filename": zod.string(),
+  "country": zod.string().nullish(),
+  "remote": zod.boolean().nullish(),
+  "parsedSummary": zod.string().describe('Gemini-extracted structured summary of the resume merged with active JumpStart project context.'),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListResumesResponse = zod.array(ListResumesResponseItem)
+
+
+/**
+ * @summary Upload a resume (PDF/Word) and parse it with Gemini; optionally merge active JumpStart project context
+ */
+export const UploadResumeBody = zod.object({
+  "file": zod.instanceof(File).describe('PDF or Word document resume.'),
+  "country": zod.string().optional().describe('Target country for job search (e.g. \"United States\").'),
+  "remote": zod.boolean().optional().describe('Whether the candidate is open to remote work.')
+})
+
+export const UploadResumeResponse = zod.object({
+  "id": zod.number(),
+  "filename": zod.string(),
+  "country": zod.string().nullish(),
+  "remote": zod.boolean().nullish(),
+  "parsedSummary": zod.string().describe('Gemini-extracted structured summary of the resume merged with active JumpStart project context.'),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Get a parsed resume by id
+ */
+export const GetResumeParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetResumeResponse = zod.object({
+  "id": zod.number(),
+  "filename": zod.string(),
+  "country": zod.string().nullish(),
+  "remote": zod.boolean().nullish(),
+  "parsedSummary": zod.string().describe('Gemini-extracted structured summary of the resume merged with active JumpStart project context.'),
+  "skills": zod.string().nullish(),
+  "experience": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List job applications
+ */
+export const ListApplicationsResponseItem = zod.object({
+  "id": zod.number(),
+  "resumeId": zod.number(),
+  "company": zod.string(),
+  "role": zod.string(),
+  "status": zod.enum(['found', 'applying', 'submitted']),
+  "coverLetter": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListApplicationsResponse = zod.array(ListApplicationsResponseItem)
+
+
+/**
+ * @summary Create a job application and generate a tailored cover letter
+ */
+
+
+
+
+export const CreateApplicationBody = zod.object({
+  "resumeId": zod.number(),
+  "company": zod.string().min(1),
+  "role": zod.string().min(1),
+  "jobDescription": zod.string().optional().describe('Optional job description to tailor the cover letter.'),
+  "notes": zod.string().optional()
+})
+
+export const CreateApplicationResponse = zod.object({
+  "id": zod.number(),
+  "resumeId": zod.number(),
+  "company": zod.string(),
+  "role": zod.string(),
+  "status": zod.enum(['found', 'applying', 'submitted']),
+  "coverLetter": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update application status or notes
+ */
+export const UpdateApplicationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateApplicationBody = zod.object({
+  "status": zod.enum(['found', 'applying', 'submitted']).optional(),
+  "notes": zod.string().optional()
+})
+
+export const UpdateApplicationResponse = zod.object({
+  "id": zod.number(),
+  "resumeId": zod.number(),
+  "company": zod.string(),
+  "role": zod.string(),
+  "status": zod.enum(['found', 'applying', 'submitted']),
+  "coverLetter": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete an application
+ */
+export const DeleteApplicationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteApplicationResponse = zod.void()
 
 
 /**

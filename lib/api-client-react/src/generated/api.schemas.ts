@@ -17,6 +17,8 @@ export interface BoardTask {
   id: string;
   title: string;
   description: string;
+  /** Research/starting solution produced by delegating this task to the background AI agent. */
+  agentNotes?: string;
 }
 
 export interface BoardColumn {
@@ -29,6 +31,8 @@ export interface Board {
   id: number;
   prompt: string;
   title: string;
+  /** Language the board's task titles/descriptions were written in. */
+  language?: string;
   columns: BoardColumn[];
   createdAt: string;
 }
@@ -36,14 +40,19 @@ export interface Board {
 export interface BoardInput {
   /** @minLength 1 */
   prompt: string;
+  /** BCP-47-ish language code (en, ar, fr, es, de) the generated task titles/descriptions should be written in. Defaults to English. */
+  language?: string;
 }
 
 export interface ExplainCodeInput {
   /** @minLength 1 */
   code: string;
-  language: string;
+  /** Programming language of the code snippet (javascript, python, etc.) */
+  programmingLanguage: string;
   /** Optional follow-up question about the code; if omitted, a general explanation is generated. */
   question?: string;
+  /** BCP-47-ish language code (en, ar, fr, es, de) the explanation should be written in. Defaults to English. */
+  uiLanguage?: string;
 }
 
 export interface Explanation {
@@ -54,6 +63,65 @@ export interface AssetJobUpload {
   file?: Blob;
   /** Raw draft content/data pasted directly by the user, used instead of a file upload. Exactly one of `file` or `text` must be provided and non-empty; if both are provided, `file` takes precedence and `text` is ignored. Omitting both returns a 400. */
   text?: string;
+  /** BCP-47-ish language code (en, ar, fr, es, de) the generated marketing copy/e-book/cover should be written in. Defaults to English. */
+  language?: string;
+}
+
+export interface ResumeUpload {
+  /** PDF or Word document resume. */
+  file: Blob;
+  /** Target country for job search (e.g. "United States"). */
+  country?: string;
+  /** Whether the candidate is open to remote work. */
+  remote?: boolean;
+}
+
+export interface Resume {
+  id: number;
+  filename: string;
+  country?: string | null;
+  remote?: boolean | null;
+  /** Gemini-extracted structured summary of the resume merged with active JumpStart project context. */
+  parsedSummary: string;
+  skills?: string | null;
+  experience?: string | null;
+  createdAt: string;
+}
+
+export type JobApplicationStatus = typeof JobApplicationStatus[keyof typeof JobApplicationStatus];
+
+
+export const JobApplicationStatus = {
+  found: 'found',
+  applying: 'applying',
+  submitted: 'submitted',
+} as const;
+
+export interface JobApplication {
+  id: number;
+  resumeId: number;
+  company: string;
+  role: string;
+  status: JobApplicationStatus;
+  coverLetter?: string | null;
+  notes?: string | null;
+  createdAt: string;
+}
+
+export interface CreateApplicationBody {
+  resumeId: number;
+  /** @minLength 1 */
+  company: string;
+  /** @minLength 1 */
+  role: string;
+  /** Optional job description to tailor the cover letter. */
+  jobDescription?: string;
+  notes?: string;
+}
+
+export interface UpdateApplicationBody {
+  status?: JobApplicationStatus;
+  notes?: string;
 }
 
 export type AssetJobStatus = typeof AssetJobStatus[keyof typeof AssetJobStatus];
@@ -74,6 +142,13 @@ export interface AssetJob {
   marketingContent?: string | null;
   /** @nullable */
   ebookContent?: string | null;
+  /**
+     * A sanitized, self-contained SVG sketch of a promotional cover/thumbnail for the asset.
+     * @nullable
+     */
+  coverSvg?: string | null;
+  /** Language the generated content was written in. */
+  language?: string;
   /** @nullable */
   error?: string | null;
   createdAt: string;

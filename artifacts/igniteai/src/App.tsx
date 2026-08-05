@@ -4,10 +4,12 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
 import { Shell } from '@/components/layout/Shell';
+import { LanguageProvider } from '@/lib/i18n';
 
 import JumpStart from '@/pages/JumpStart';
 import LiveLab from '@/pages/LiveLab';
 import AssetReviver from '@/pages/AssetReviver';
+import CareerCatalyst from '@/pages/CareerCatalyst';
 
 const queryClient = new QueryClient();
 
@@ -18,6 +20,7 @@ function Router() {
         <Route path="/" component={JumpStart} />
         <Route path="/livelab" component={LiveLab} />
         <Route path="/asset-reviver" component={AssetReviver} />
+        <Route path="/career" component={CareerCatalyst} />
         <Route component={NotFound} />
       </Switch>
     </Shell>
@@ -27,12 +30,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+        </TooltipProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

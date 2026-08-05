@@ -11,8 +11,10 @@ export const assetJobsTable = pgTable("asset_jobs", {
     .notNull()
     .default("pending"),
   sourceText: text("source_text").notNull(),
+  language: text("language").notNull().default("en"),
   marketingContent: text("marketing_content"),
   ebookContent: text("ebook_content"),
+  coverSvg: text("cover_svg"),
   error: text("error"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

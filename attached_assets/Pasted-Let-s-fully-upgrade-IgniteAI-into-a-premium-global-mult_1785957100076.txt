@@ -1,0 +1,30 @@
+Let's fully upgrade IgniteAI into a premium, global multi-lingual production ecosystem driven by a Multi-Agent "Team of One" architecture. Please read the existing `.agents/memory` folder carefully to preserve previous context before implementing the following architecture across the application:
+
+1. Global Language Selector & RTL UI:
+- Replace any single-language logic with a clean global language Dropdown menu in the navigation bar/sidebar (Arabic, English, French, Spanish, German).
+- Dynamically translate all static UI elements and enforce native RTL layout alignment when Arabic is selected.
+
+2. Mobile Responsive Kanban Board (JumpStart Fix):
+- Fix the horizontal scroll issue on mobile viewports for the 5-column Kanban board. Columns must stack beautifully (grid-cols-1) or switch via tabs on small screens.
+
+3. Background Multi-Agent Team Execution & Optimization (JumpStart & LiveLab Upgrade):
+- Refactor the 'Delegate to Agent' feature on Kanban tasks into an optimized Multi-Agent pipeline:
+  a) Research Sub-Agent: Gathers technical requirements and API dependencies.
+  b) Coder Sub-Agent: Writes initial functional code blocks.
+  c) QA Sub-Agent: Reviews security/syntax, then moves the ticket to 'Ready for Review'.
+- Context Window Optimization: Implement strict context summarization between agent handoffs to minimize token usage and keep execution light and fast on mobile viewports.
+- Implement a Self-Healing automation inside the development environment: if a codegen/build error occurs, pass the logs to a sub-agent to autonomously attempt a re-run or code fix.
+
+4. Focus Guard & Pomodoro Module (LiveLab Upgrade):
+- Integrate a visual Pomodoro Timer (25 mins focus / 5 mins review). Prompt architectural tips if the user remains inactive or stuck on a block for more than 10 minutes.
+
+5. Multimodal Visual Assets & Media (Asset Reviver Upgrade):
+- Upgrade the output viewport to render Gumroad/KDP product cover thumbnails using generative image models, format course slides, and dynamically render system architecture diagrams via Mermaid.js alongside the output text.
+
+6. Career Catalyst (Autonomous Job Agent Module with Ecosystem Synergy):
+- Add a brand new section/tab named 'Career Catalyst'.
+- Implement a Resume File Uploader (PDF/Word) and a geographic Country/Remote location selector.
+- Database Schema: Implement `resumes` and `job_applications` tables in SQLite/schema definition to store parsed user data and track jobs through a mini Kanban board ('Found', 'Applying', 'Submitted').
+- Ecosystem Synergy Feature: Configure Gemini to parse the uploaded resume but explicitly merge it with the user's active/completed project data from JumpStart and LiveLab. The agent must inject these real, live local projects into the autonomously tailored Cover Letters and outreach text to maximize developer credibility.
+
+Review the existing codebase carefully, ensure clean typechecking, and deploy these updates together smoothly.

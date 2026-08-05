@@ -2,13 +2,14 @@ import { Router, type IRouter } from "express";
 import { randomUUID } from "node:crypto";
 import { z } from "zod/v4";
 import { desc, eq } from "drizzle-orm";
-import { db, boardsTable, type BoardColumnJson } from "@workspace/db";
+import { db, boardsTable, type BoardColumnJson, type BoardTaskJson } from "@workspace/db";
 import {
   CreateBoardBody,
   GetBoardParams,
   DeleteBoardParams,
+  DelegateTaskParams,
 } from "@workspace/api-zod";
-import { generateJson } from "../lib/gemini";
+import { generateJson, generateText } from "../lib/gemini";
 
 const router: IRouter = Router();
 
@@ -89,6 +90,12 @@ router.post("/jumpstart/boards", async (req, res): Promise<void> => {
     return;
   }
 
+  const uiLang = parsed.data.language ?? "en";
+  const langNote =
+    uiLang !== "en"
+      ? `\n\nIMPORTANT: Write all task titles and descriptions in the language with BCP-47 code "${uiLang}".`
+      : "";
+
   let generated: GeneratedBoard;
   try {
     const raw = await generateJson<unknown>({
@@ -103,7 +110,8 @@ router.post("/jumpstart/boards", async (req, res): Promise<void> => {
         "- \"Backlog\" should hold implementation and polish work not yet started; \"In Progress\" should hold the 2-4 highest-priority tasks to start on immediately; \"Review & Testing\" should hold QA, code review, and validation tasks.\n" +
         "- Each task title must be a short, actionable developer-ticket phrase starting with a verb (e.g. \"Design the user schema\", \"Build the checkout API endpoint\", \"Wire up Stripe webhook handling\") — never a vague noun phrase like \"Backend\" or \"Testing\".\n" +
         "- Each task description must be 1-2 sentences of concrete implementation detail or acceptance criteria — specific enough that an engineer could pick it up without asking clarifying questions.\n" +
-        "- Produce 3-7 tasks per non-empty column, sized so each task is roughly a few hours to two days of focused work. Avoid duplicate or overlapping tasks across columns.",
+        "- Produce 3-7 tasks per non-empty column, sized so each task is roughly a few hours to two days of focused work. Avoid duplicate or overlapping tasks across columns." +
+        langNote,
       prompt: parsed.data.prompt,
     });
     generated = normalizeGeneratedBoard(generatedBoardSchema.parse(raw));
@@ -128,6 +136,7 @@ router.post("/jumpstart/boards", async (req, res): Promise<void> => {
     .values({
       prompt: parsed.data.prompt,
       title: generated.title,
+      language: uiLang,
       columns,
     })
     .returning();
@@ -154,6 +163,158 @@ router.get("/jumpstart/boards/:id", async (req, res): Promise<void> => {
 
   res.json(board);
 });
+
+// ---------------------------------------------------------------------------
+// Delegate task — Multi-Agent pipeline: Research → Coder → QA
+// ---------------------------------------------------------------------------
+router.post(
+  "/jumpstart/boards/:id/tasks/:taskId/delegate",
+  async (req, res): Promise<void> => {
+    const params = DelegateTaskParams.safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({ error: params.error.message });
+      return;
+    }
+
+    const [board] = await db
+      .select()
+      .from(boardsTable)
+      .where(eq(boardsTable.id, params.data.id));
+
+    if (!board) {
+      res.status(404).json({ error: "Board not found" });
+      return;
+    }
+
+    // Locate the task across all columns
+    let foundTask: BoardTaskJson | null = null;
+    let fromColIdx = -1;
+    let fromTaskIdx = -1;
+    const columns = board.columns as BoardColumnJson[];
+    for (let ci = 0; ci < columns.length; ci++) {
+      const ti = columns[ci]!.tasks.findIndex(
+        (t) => t.id === params.data.taskId,
+      );
+      if (ti !== -1) {
+        foundTask = columns[ci]!.tasks[ti]!;
+        fromColIdx = ci;
+        fromTaskIdx = ti;
+        break;
+      }
+    }
+
+    if (!foundTask) {
+      res.status(404).json({ error: "Task not found" });
+      return;
+    }
+
+    // ── Agent 1: Research ──────────────────────────────────────────────────
+    let researchSummary: string;
+    try {
+      researchSummary = await generateText({
+        systemInstruction:
+          "You are the Research Sub-Agent in a multi-agent development pipeline. " +
+          "Given a single developer task ticket, identify the key technical requirements, " +
+          "relevant APIs or libraries, and any architectural dependencies to be aware of. " +
+          "Respond in 3-5 concise bullet points. Keep it tightly scoped to the task.",
+        prompt: `Task: ${foundTask.title}\nDescription: ${foundTask.description}`,
+      });
+    } catch (err) {
+      req.log.error({ err }, "Research sub-agent failed");
+      res.status(502).json({ error: "Research agent failed" });
+      return;
+    }
+
+    // ── Agent 2: Coder (context-summarized handoff) ────────────────────────
+    let codeSketch: string;
+    try {
+      codeSketch = await generateText({
+        systemInstruction:
+          "You are the Coder Sub-Agent. You receive a concise research summary and a task ticket. " +
+          "Write a minimal but functional starting code block or pseudocode outline that directly " +
+          "implements the task. Include inline comments. Keep output under 40 lines.",
+        prompt:
+          `Task: ${foundTask.title}\n` +
+          `Description: ${foundTask.description}\n\n` +
+          `Research handoff (summary):\n${researchSummary}`,
+      });
+    } catch (err) {
+      req.log.error({ err }, "Coder sub-agent failed");
+      res.status(502).json({ error: "Coder agent failed" });
+      return;
+    }
+
+    // ── Agent 3: QA (security + syntax review) ────────────────────────────
+    let qaReview: string;
+    try {
+      qaReview = await generateText({
+        systemInstruction:
+          "You are the QA Sub-Agent. Review the provided code sketch for security issues, " +
+          "syntax errors, edge cases, and readability. Give a 2-4 sentence verdict and list " +
+          "any concrete improvements. End with 'STATUS: READY FOR REVIEW' if it passes.",
+        prompt:
+          `Task: ${foundTask.title}\n\n` +
+          `Code sketch:\n${codeSketch}`,
+      });
+    } catch (err) {
+      req.log.error({ err }, "QA sub-agent failed");
+      res.status(502).json({ error: "QA agent failed" });
+      return;
+    }
+
+    const agentNotes =
+      `## 🔍 Research Agent\n${researchSummary}\n\n` +
+      `## 💻 Coder Agent\n\`\`\`\n${codeSketch}\n\`\`\`\n\n` +
+      `## ✅ QA Agent\n${qaReview}`;
+
+    // Move task to "Review & Testing" column, attach agent notes
+    const reviewColIdx = columns.findIndex(
+      (c) => c.title === "Review & Testing",
+    );
+
+    const updatedColumns = columns.map((col, ci) => {
+      if (ci === fromColIdx) {
+        return {
+          ...col,
+          tasks: col.tasks.filter((_, ti) => ti !== fromTaskIdx),
+        };
+      }
+      if (ci === reviewColIdx && reviewColIdx !== fromColIdx) {
+        return {
+          ...col,
+          tasks: [
+            { ...foundTask!, agentNotes },
+            ...col.tasks,
+          ] as BoardTaskJson[],
+        };
+      }
+      return col;
+    });
+
+    // If task is already in "Review & Testing", just update agentNotes in place
+    const finalColumns =
+      reviewColIdx === fromColIdx
+        ? columns.map((col, ci) =>
+            ci === fromColIdx
+              ? {
+                  ...col,
+                  tasks: col.tasks.map((t, ti) =>
+                    ti === fromTaskIdx ? { ...t, agentNotes } : t,
+                  ),
+                }
+              : col,
+          )
+        : updatedColumns;
+
+    const [updated] = await db
+      .update(boardsTable)
+      .set({ columns: finalColumns })
+      .where(eq(boardsTable.id, params.data.id))
+      .returning();
+
+    res.json(updated);
+  },
+);
 
 router.delete("/jumpstart/boards/:id", async (req, res): Promise<void> => {
   const params = DeleteBoardParams.safeParse(req.params);

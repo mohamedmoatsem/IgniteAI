@@ -15,6 +15,13 @@ export interface AssetJob {
   marketingContent?: string | null;
   /** @nullable */
   ebookContent?: string | null;
+  /**
+     * A sanitized, self-contained SVG sketch of a promotional cover/thumbnail for the asset.
+     * @nullable
+     */
+  coverSvg?: string | null;
+  /** Language the generated content was written in. */
+  language?: string;
   /** @nullable */
   error?: string | null;
   createdAt: Date;
