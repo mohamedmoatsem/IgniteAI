@@ -63,6 +63,31 @@ type TranslationKey =
   | "assetReviver.ebookTab"
   | "assetReviver.coverTab"
   | "assetReviver.cover"
+  | "career.title"
+  | "career.subtitle"
+  | "career.resumes"
+  | "career.targetCountry"
+  | "career.remote"
+  | "career.uploadResume"
+  | "career.uploadHint"
+  | "career.skills"
+  | "career.experience"
+  | "career.jobApplications"
+  | "career.addApplication"
+  | "career.uploadToStart"
+  | "career.newApplication"
+  | "career.company"
+  | "career.companyPlaceholder"
+  | "career.role"
+  | "career.rolePlaceholder"
+  | "career.jobDesc"
+  | "career.jobDescPlaceholder"
+  | "career.generateCoverLetter"
+  | "career.found"
+  | "career.applying"
+  | "career.submitted"
+  | "career.letter"
+  | "career.remoteBadge"
 
 type Translations = Record<TranslationKey, string>
 
@@ -116,6 +141,31 @@ const en: Translations = {
   "assetReviver.ebookTab": "E-Book",
   "assetReviver.coverTab": "Cover Art",
   "assetReviver.cover": "Promotional cover sketch",
+  "career.title": "Career Catalyst",
+  "career.subtitle": "Upload your resume, let AI merge your real projects, and track job applications.",
+  "career.resumes": "Resumes",
+  "career.targetCountry": "Target country (e.g. USA)",
+  "career.remote": "Open to remote",
+  "career.uploadResume": "Upload resume",
+  "career.uploadHint": "PDF, Word, or text file",
+  "career.skills": "Skills",
+  "career.experience": "Experience",
+  "career.jobApplications": "Job Applications",
+  "career.addApplication": "Add Application",
+  "career.uploadToStart": "Upload or select a resume above to start tracking applications.",
+  "career.newApplication": "New Job Application",
+  "career.company": "Company",
+  "career.companyPlaceholder": "e.g. Stripe",
+  "career.role": "Role",
+  "career.rolePlaceholder": "e.g. Senior Software Engineer",
+  "career.jobDesc": "Job description (optional — improves cover letter)",
+  "career.jobDescPlaceholder": "Paste the job description or key requirements…",
+  "career.generateCoverLetter": "Generate cover letter & add",
+  "career.found": "Found",
+  "career.applying": "Applying",
+  "career.submitted": "Submitted",
+  "career.letter": "Letter",
+  "career.remoteBadge": "Remote",
 }
 
 const ar: Translations = {
@@ -168,6 +218,31 @@ const ar: Translations = {
   "assetReviver.ebookTab": "الكتاب الإلكتروني",
   "assetReviver.coverTab": "تصميم الغلاف",
   "assetReviver.cover": "مخطط الغلاف الترويجي",
+  "career.title": "محفز المسيرة",
+  "career.subtitle": "ارفع سيرتك الذاتية، دع الذكاء الاصطناعي يدمج مشاريعك الحقيقية، وتتبع طلبات التوظيف.",
+  "career.resumes": "السير الذاتية",
+  "career.targetCountry": "الدولة المستهدفة (مثل: السعودية)",
+  "career.remote": "منفتح على العمل عن بُعد",
+  "career.uploadResume": "رفع السيرة الذاتية",
+  "career.uploadHint": "PDF أو Word أو ملف نصي",
+  "career.skills": "المهارات",
+  "career.experience": "الخبرة",
+  "career.jobApplications": "طلبات التوظيف",
+  "career.addApplication": "إضافة طلب",
+  "career.uploadToStart": "ارفع أو اختر سيرة ذاتية أعلاه لبدء تتبع الطلبات.",
+  "career.newApplication": "طلب توظيف جديد",
+  "career.company": "الشركة",
+  "career.companyPlaceholder": "مثال: أرامكو",
+  "career.role": "المنصب",
+  "career.rolePlaceholder": "مثال: مهندس برمجيات أول",
+  "career.jobDesc": "وصف الوظيفة (اختياري — يُحسّن رسالة التغطية)",
+  "career.jobDescPlaceholder": "الصق وصف الوظيفة أو المتطلبات الرئيسية...",
+  "career.generateCoverLetter": "إنشاء رسالة تغطية وإضافة",
+  "career.found": "تم العثور عليها",
+  "career.applying": "جارٍ التقديم",
+  "career.submitted": "تم الإرسال",
+  "career.letter": "الرسالة",
+  "career.remoteBadge": "عن بُعد",
 }
 
 const fr: Translations = {
@@ -220,6 +295,31 @@ const fr: Translations = {
   "assetReviver.ebookTab": "E-Book",
   "assetReviver.coverTab": "Illustration de couverture",
   "assetReviver.cover": "Esquisse de couverture promotionnelle",
+  "career.title": "Career Catalyst",
+  "career.subtitle": "Importez votre CV, laissez l'IA fusionner vos projets réels et suivez vos candidatures.",
+  "career.resumes": "CV",
+  "career.targetCountry": "Pays cible (ex. France)",
+  "career.remote": "Ouvert au télétravail",
+  "career.uploadResume": "Importer le CV",
+  "career.uploadHint": "PDF, Word ou fichier texte",
+  "career.skills": "Compétences",
+  "career.experience": "Expérience",
+  "career.jobApplications": "Candidatures",
+  "career.addApplication": "Ajouter une candidature",
+  "career.uploadToStart": "Importez ou sélectionnez un CV ci-dessus pour commencer.",
+  "career.newApplication": "Nouvelle candidature",
+  "career.company": "Entreprise",
+  "career.companyPlaceholder": "ex. Airbus",
+  "career.role": "Poste",
+  "career.rolePlaceholder": "ex. Ingénieur logiciel senior",
+  "career.jobDesc": "Description du poste (optionnel — améliore la lettre)",
+  "career.jobDescPlaceholder": "Collez la description du poste ou les exigences clés…",
+  "career.generateCoverLetter": "Générer la lettre & ajouter",
+  "career.found": "Trouvé",
+  "career.applying": "En cours",
+  "career.submitted": "Envoyée",
+  "career.letter": "Lettre",
+  "career.remoteBadge": "Télétravail",
 }
 
 const es: Translations = {
@@ -272,6 +372,31 @@ const es: Translations = {
   "assetReviver.ebookTab": "E-Book",
   "assetReviver.coverTab": "Arte de portada",
   "assetReviver.cover": "Boceto de portada promocional",
+  "career.title": "Career Catalyst",
+  "career.subtitle": "Sube tu CV, deja que la IA integre tus proyectos reales y haz seguimiento de candidaturas.",
+  "career.resumes": "CVs",
+  "career.targetCountry": "País objetivo (ej. España)",
+  "career.remote": "Abierto al trabajo remoto",
+  "career.uploadResume": "Subir CV",
+  "career.uploadHint": "PDF, Word o archivo de texto",
+  "career.skills": "Habilidades",
+  "career.experience": "Experiencia",
+  "career.jobApplications": "Solicitudes de empleo",
+  "career.addApplication": "Añadir solicitud",
+  "career.uploadToStart": "Sube o selecciona un CV arriba para empezar a rastrear solicitudes.",
+  "career.newApplication": "Nueva solicitud de empleo",
+  "career.company": "Empresa",
+  "career.companyPlaceholder": "ej. Telefónica",
+  "career.role": "Puesto",
+  "career.rolePlaceholder": "ej. Ingeniero de software senior",
+  "career.jobDesc": "Descripción del puesto (opcional — mejora la carta)",
+  "career.jobDescPlaceholder": "Pega la descripción o los requisitos clave…",
+  "career.generateCoverLetter": "Generar carta & añadir",
+  "career.found": "Encontrada",
+  "career.applying": "Solicitando",
+  "career.submitted": "Enviada",
+  "career.letter": "Carta",
+  "career.remoteBadge": "Remoto",
 }
 
 const de: Translations = {
@@ -324,6 +449,31 @@ const de: Translations = {
   "assetReviver.ebookTab": "E-Book",
   "assetReviver.coverTab": "Cover-Design",
   "assetReviver.cover": "Werbe-Cover-Skizze",
+  "career.title": "Career Catalyst",
+  "career.subtitle": "Lade deinen Lebenslauf hoch, lass die KI deine echten Projekte einbinden und verfolge Bewerbungen.",
+  "career.resumes": "Lebensläufe",
+  "career.targetCountry": "Zielland (z. B. Deutschland)",
+  "career.remote": "Offen für Remote-Arbeit",
+  "career.uploadResume": "Lebenslauf hochladen",
+  "career.uploadHint": "PDF, Word oder Textdatei",
+  "career.skills": "Fähigkeiten",
+  "career.experience": "Erfahrung",
+  "career.jobApplications": "Bewerbungen",
+  "career.addApplication": "Bewerbung hinzufügen",
+  "career.uploadToStart": "Lade einen Lebenslauf hoch oder wähle einen aus, um Bewerbungen zu verfolgen.",
+  "career.newApplication": "Neue Bewerbung",
+  "career.company": "Unternehmen",
+  "career.companyPlaceholder": "z. B. SAP",
+  "career.role": "Stelle",
+  "career.rolePlaceholder": "z. B. Senior Software Engineer",
+  "career.jobDesc": "Stellenbeschreibung (optional — verbessert das Anschreiben)",
+  "career.jobDescPlaceholder": "Stellenbeschreibung oder Anforderungen einfügen…",
+  "career.generateCoverLetter": "Anschreiben generieren & hinzufügen",
+  "career.found": "Gefunden",
+  "career.applying": "Beworben",
+  "career.submitted": "Eingereicht",
+  "career.letter": "Anschreiben",
+  "career.remoteBadge": "Remote",
 }
 
 const DICTIONARIES: Record<LanguageCode, Translations> = { en, ar, fr, es, de }

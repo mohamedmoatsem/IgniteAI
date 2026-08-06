@@ -23,16 +23,20 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import { format } from "date-fns"
 import ReactMarkdown from "react-markdown"
+import { useLanguage } from "@/lib/i18n"
 
 type AppStatus = "found" | "applying" | "submitted"
-const KANBAN_COLS: { id: AppStatus; label: string; icon: React.ReactNode }[] = [
-  { id: "found", label: "Found", icon: <Clock className="w-3.5 h-3.5" /> },
-  { id: "applying", label: "Applying", icon: <Send className="w-3.5 h-3.5" /> },
-  { id: "submitted", label: "Submitted", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-]
 
 export default function CareerCatalyst() {
   const queryClient = useQueryClient()
+  const { t, dir, language } = useLanguage()
+
+  // Kanban columns use translated labels
+  const KANBAN_COLS: { id: AppStatus; label: string; icon: React.ReactNode }[] = [
+    { id: "found",     label: t("career.found"),     icon: <Clock className="w-3.5 h-3.5" /> },
+    { id: "applying",  label: t("career.applying"),  icon: <Send className="w-3.5 h-3.5" /> },
+    { id: "submitted", label: t("career.submitted"), icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
+  ]
 
   const { data: resumes, isLoading: isLoadingResumes } = useListResumes()
   const { data: applications, isLoading: isLoadingApps } = useListApplications()
@@ -61,14 +65,8 @@ export default function CareerCatalyst() {
 
   // Cover letter view
   const [coverAppId, setCoverAppId] = useState<number | null>(null)
-  const coverApp = applications?.find(a => a.id === coverAppId)
 
   const handleFileSelect = (file: File) => {
-    const data = new FormData()
-    data.append("file", file)
-    if (country) data.append("country", country)
-    data.append("remote", String(remote))
-
     uploadResume.mutate(
       { data: { file, country: country || undefined, remote } },
       {
@@ -117,35 +115,54 @@ export default function CareerCatalyst() {
 
   const appsInCol = (col: AppStatus) => applications?.filter(a => a.status === col) ?? []
 
+  // Format dates using the current locale
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleString(language, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
+    } catch {
+      return format(new Date(dateStr), "MMM d, h:mm a")
+    }
+  }
+
   return (
-    <div className="flex-1 flex flex-col h-full bg-background overflow-hidden">
+    <div dir={dir} className="flex-1 flex flex-col h-full bg-background overflow-hidden">
+      {/* Page header */}
       <div className="border-b border-border bg-card px-4 md:px-6 py-4 shrink-0">
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Briefcase className="w-6 h-6 text-primary" />
-          Career Catalyst
+          {t("career.title")}
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Upload your resume, let AI merge your real projects, and track job applications.
-        </p>
+        <p className="text-sm text-muted-foreground mt-1">{t("career.subtitle")}</p>
       </div>
 
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Resume sidebar */}
-        <div className="w-full md:w-80 border-b md:border-b-0 md:border-r border-border bg-muted/20 flex flex-col shrink-0 max-h-96 md:max-h-none md:h-full overflow-y-auto">
-          <div className="p-4 font-semibold text-xs text-muted-foreground uppercase tracking-wider">Resumes</div>
+        <div className="w-full md:w-80 border-b md:border-b-0 md:border-e border-border bg-muted/20 flex flex-col shrink-0 max-h-96 md:max-h-none md:h-full overflow-y-auto">
+          <div className="p-4 font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+            {t("career.resumes")}
+          </div>
           <div className="px-4 pb-4 flex flex-col gap-3">
-            {/* Location/remote */}
+            {/* Location / remote */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                <Input value={country} onChange={(e) => setCountry(e.target.value)}
-                  placeholder="Target country (e.g. USA)" className="h-8 text-xs" />
+                <Input
+                  dir={dir}
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  placeholder={t("career.targetCountry")}
+                  className="h-8 text-xs"
+                />
               </div>
               <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
-                <input type="checkbox" checked={remote} onChange={(e) => setRemote(e.target.checked)}
-                  className="rounded" />
+                <input
+                  type="checkbox"
+                  checked={remote}
+                  onChange={(e) => setRemote(e.target.checked)}
+                  className="rounded"
+                />
                 <Globe className="w-3.5 h-3.5" />
-                Open to remote
+                {t("career.remote")}
               </label>
             </div>
 
@@ -153,35 +170,48 @@ export default function CareerCatalyst() {
             <div
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
               onDragLeave={() => setIsDragging(false)}
-              onDrop={(e) => { e.preventDefault(); setIsDragging(false); e.dataTransfer.files?.[0] && handleFileSelect(e.dataTransfer.files[0]) }}
+              onDrop={(e) => {
+                e.preventDefault()
+                setIsDragging(false)
+                const file = e.dataTransfer.files?.[0]
+                if (file) handleFileSelect(file)
+              }}
               onClick={() => fileInputRef.current?.click()}
               className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all flex flex-col items-center gap-2
                 ${isDragging ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/50"}
                 ${uploadResume.isPending ? "opacity-50 pointer-events-none" : ""}`}
             >
-              <input ref={fileInputRef} type="file" className="hidden"
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
                 accept=".pdf,.doc,.docx,.txt,.md"
-                onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} />
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileSelect(f) }}
+              />
               {uploadResume.isPending
                 ? <Loader2 className="w-7 h-7 text-primary animate-spin" />
                 : <UploadCloud className={`w-7 h-7 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />}
-              <p className="text-sm font-medium">Upload resume</p>
-              <p className="text-xs text-muted-foreground">PDF, Word, or text file</p>
+              <p className="text-sm font-medium">{t("career.uploadResume")}</p>
+              <p className="text-xs text-muted-foreground">{t("career.uploadHint")}</p>
             </div>
 
             {/* Resume list */}
             {isLoadingResumes
               ? Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-lg" />)
               : resumes?.map((r) => (
-                <button key={r.id} onClick={() => setSelectedResumeId(r.id)}
-                  className={`w-full text-left p-3 rounded-xl border transition-all
-                    ${selectedResumeId === r.id ? "bg-card border-primary ring-1 ring-primary shadow-sm" : "bg-card/50 border-border hover:border-primary/50 hover:bg-card"}`}
+                <button
+                  key={r.id}
+                  onClick={() => setSelectedResumeId(r.id)}
+                  className={`w-full text-start p-3 rounded-xl border transition-all
+                    ${selectedResumeId === r.id
+                      ? "bg-card border-primary ring-1 ring-primary shadow-sm"
+                      : "bg-card/50 border-border hover:border-primary/50 hover:bg-card"}`}
                 >
                   <div className="flex items-center gap-2">
                     <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">{r.filename}</p>
-                      <p className="text-[10px] text-muted-foreground">{format(new Date(r.createdAt), "MMM d, h:mm a")}</p>
+                      <p className="text-[10px] text-muted-foreground">{formatDate(r.createdAt)}</p>
                     </div>
                   </div>
                 </button>
@@ -196,24 +226,29 @@ export default function CareerCatalyst() {
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
               <Card className="border-primary/30 bg-primary/5">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <User className="w-4 h-4 text-primary" />
-                    {selectedResume.filename}
+                  <CardTitle className="text-base flex items-center gap-2 flex-wrap">
+                    <User className="w-4 h-4 text-primary shrink-0" />
+                    <span dir="auto">{selectedResume.filename}</span>
                     {selectedResume.country && (
                       <Badge variant="outline" className="text-[10px]">
-                        <MapPin className="w-2.5 h-2.5 mr-1" />{selectedResume.country}
+                        <MapPin className="w-2.5 h-2.5 me-1" />
+                        {selectedResume.country}
                       </Badge>
                     )}
                     {selectedResume.remote && (
-                      <Badge variant="outline" className="text-[10px]">Remote</Badge>
+                      <Badge variant="outline" className="text-[10px]">{t("career.remoteBadge")}</Badge>
                     )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3 text-sm">
-                  <p className="text-muted-foreground leading-relaxed">{selectedResume.parsedSummary}</p>
+                  <p dir="auto" className="text-muted-foreground leading-relaxed">
+                    {selectedResume.parsedSummary}
+                  </p>
                   {selectedResume.skills && (
                     <div>
-                      <p className="font-medium mb-1 text-xs uppercase tracking-wider text-muted-foreground">Skills</p>
+                      <p className="font-medium mb-1 text-xs uppercase tracking-wider text-muted-foreground">
+                        {t("career.skills")}
+                      </p>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedResume.skills.split(",").map((s, i) => (
                           <Badge key={i} variant="secondary" className="text-xs">{s.trim()}</Badge>
@@ -223,8 +258,10 @@ export default function CareerCatalyst() {
                   )}
                   {selectedResume.experience && (
                     <div>
-                      <p className="font-medium mb-1 text-xs uppercase tracking-wider text-muted-foreground">Experience</p>
-                      <div className="prose prose-xs dark:prose-invert max-w-none">
+                      <p className="font-medium mb-1 text-xs uppercase tracking-wider text-muted-foreground">
+                        {t("career.experience")}
+                      </p>
+                      <div dir="auto" className="prose prose-xs dark:prose-invert max-w-none">
                         <ReactMarkdown>{selectedResume.experience}</ReactMarkdown>
                       </div>
                     </div>
@@ -236,45 +273,62 @@ export default function CareerCatalyst() {
 
           {/* Applications Kanban */}
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-foreground">Job Applications</h2>
+            <div className="flex items-center justify-between mb-4 gap-2">
+              <h2 className="font-semibold text-foreground">{t("career.jobApplications")}</h2>
               <Dialog open={appDialogOpen} onOpenChange={setAppDialogOpen}>
                 <DialogTrigger asChild>
                   <Button size="sm" className="gap-1.5" disabled={!selectedResumeId}>
                     <Plus className="w-3.5 h-3.5" />
-                    Add Application
+                    {t("career.addApplication")}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md" dir={dir}>
                   <DialogHeader>
-                    <DialogTitle>New Job Application</DialogTitle>
+                    <DialogTitle>{t("career.newApplication")}</DialogTitle>
                   </DialogHeader>
                   <div className="flex flex-col gap-3 py-2">
                     <div className="flex flex-col gap-1">
-                      <label className="text-sm font-medium">Company</label>
-                      <Input value={appCompany} onChange={(e) => setAppCompany(e.target.value)}
-                        placeholder="e.g. Stripe" />
+                      <label className="text-sm font-medium">{t("career.company")}</label>
+                      <Input
+                        dir={dir}
+                        value={appCompany}
+                        onChange={(e) => setAppCompany(e.target.value)}
+                        placeholder={t("career.companyPlaceholder")}
+                      />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-sm font-medium">Role</label>
-                      <Input value={appRole} onChange={(e) => setAppRole(e.target.value)}
-                        placeholder="e.g. Senior Software Engineer" />
+                      <label className="text-sm font-medium">{t("career.role")}</label>
+                      <Input
+                        dir={dir}
+                        value={appRole}
+                        onChange={(e) => setAppRole(e.target.value)}
+                        placeholder={t("career.rolePlaceholder")}
+                      />
                     </div>
                     <div className="flex flex-col gap-1">
                       <label className="text-sm font-medium text-muted-foreground">
-                        Job description (optional — improves cover letter)
+                        {t("career.jobDesc")}
                       </label>
-                      <Textarea value={appDesc} onChange={(e) => setAppDesc(e.target.value)}
-                        placeholder="Paste the job description or key requirements…" rows={4}
-                        className="text-sm resize-none" />
+                      <Textarea
+                        dir={dir}
+                        value={appDesc}
+                        onChange={(e) => setAppDesc(e.target.value)}
+                        placeholder={t("career.jobDescPlaceholder")}
+                        rows={4}
+                        className="text-sm resize-none"
+                      />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button onClick={handleCreateApp}
+                    <Button
+                      onClick={handleCreateApp}
                       disabled={!appCompany.trim() || !appRole.trim() || createApp.isPending}
-                      className="gap-2">
-                      {createApp.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                      Generate cover letter & add
+                      className="gap-2"
+                    >
+                      {createApp.isPending
+                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                        : <Sparkles className="w-4 h-4" />}
+                      {t("career.generateCoverLetter")}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -282,32 +336,45 @@ export default function CareerCatalyst() {
             </div>
 
             {!selectedResumeId && (
-              <p className="text-sm text-muted-foreground">Upload or select a resume above to start tracking applications.</p>
+              <p className="text-sm text-muted-foreground">{t("career.uploadToStart")}</p>
             )}
 
             {isLoadingApps
-              ? <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32" />)}</div>
+              ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32" />)}
+                </div>
+              )
               : (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {KANBAN_COLS.map(col => (
                     <div key={col.id} className="flex flex-col gap-2.5 bg-muted/30 rounded-xl p-3 border border-border min-h-32">
                       <div className="flex items-center gap-1.5 text-sm font-semibold px-1">
                         {col.icon} {col.label}
-                        <span className="ml-auto text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{appsInCol(col.id).length}</span>
+                        <span className="ms-auto text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                          {appsInCol(col.id).length}
+                        </span>
                       </div>
                       <AnimatePresence>
                         {appsInCol(col.id).map(app => (
-                          <motion.div key={app.id}
-                            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                          <motion.div
+                            key={app.id}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-card rounded-lg border border-border p-3 shadow-sm flex flex-col gap-2">
+                            className="bg-card rounded-lg border border-border p-3 shadow-sm flex flex-col gap-2"
+                          >
                             <div className="flex items-start justify-between gap-2">
                               <div className="min-w-0">
-                                <p className="font-semibold text-sm leading-tight truncate">{app.company}</p>
-                                <p className="text-xs text-muted-foreground truncate">{app.role}</p>
+                                <p dir="auto" className="font-semibold text-sm leading-tight truncate">{app.company}</p>
+                                <p dir="auto" className="text-xs text-muted-foreground truncate">{app.role}</p>
                               </div>
-                              <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
-                                onClick={() => handleDeleteApp(app.id)}>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
+                                onClick={() => handleDeleteApp(app.id)}
+                              >
                                 <Trash2 className="w-3 h-3" />
                               </Button>
                             </div>
@@ -317,22 +384,26 @@ export default function CareerCatalyst() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="found">Found</SelectItem>
-                                  <SelectItem value="applying">Applying</SelectItem>
-                                  <SelectItem value="submitted">Submitted</SelectItem>
+                                  <SelectItem value="found">{t("career.found")}</SelectItem>
+                                  <SelectItem value="applying">{t("career.applying")}</SelectItem>
+                                  <SelectItem value="submitted">{t("career.submitted")}</SelectItem>
                                 </SelectContent>
                               </Select>
                               {app.coverLetter && (
-                                <Button variant="ghost" size="sm" className="h-7 text-xs px-2 gap-1"
-                                  onClick={() => setCoverAppId(app.id === coverAppId ? null : app.id)}>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 text-xs px-2 gap-1"
+                                  onClick={() => setCoverAppId(app.id === coverAppId ? null : app.id)}
+                                >
                                   <FileText className="w-3 h-3" />
-                                  Letter
+                                  {t("career.letter")}
                                   <ChevronRight className={`w-3 h-3 transition-transform ${coverAppId === app.id ? "rotate-90" : ""}`} />
                                 </Button>
                               )}
                             </div>
                             {coverAppId === app.id && app.coverLetter && (
-                              <div className="text-xs bg-muted/50 rounded-lg p-2.5 border border-border leading-relaxed whitespace-pre-wrap">
+                              <div dir="auto" className="text-xs bg-muted/50 rounded-lg p-2.5 border border-border leading-relaxed whitespace-pre-wrap">
                                 {app.coverLetter}
                               </div>
                             )}

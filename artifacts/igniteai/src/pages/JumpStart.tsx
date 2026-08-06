@@ -117,28 +117,33 @@ export default function JumpStart() {
                   <motion.div key={board.id}
                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }} transition={{ delay: i * 0.04 }}>
-                    <div
-                      role="button" tabIndex={0}
-                      onClick={() => { setSelectedBoardId(board.id); setActiveColTab("0") }}
-                      onKeyDown={(e) => { if (e.key === "Enter") { setSelectedBoardId(board.id); setActiveColTab("0") } }}
-                      className={`w-full cursor-pointer text-left p-3 rounded-xl border transition-all ${
-                        selectedBoardId === board.id
-                          ? "bg-card border-primary ring-1 ring-primary shadow-sm"
-                          : "bg-card/50 border-border hover:border-primary/50 hover:bg-card"
-                      }`}>
-                      <div className="flex justify-between items-start gap-2">
-                        <h3 className="font-semibold text-sm line-clamp-1 flex-1">{board.title}</h3>
-                        <button
-                          className="h-6 w-6 -mr-1 -mt-1 shrink-0 rounded flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                          onClick={(e) => handleDelete(board.id, e)}>
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                    {/* Wrapper: relative so the delete button can be positioned without nesting inside the interactive div */}
+                    <div className="relative group/card">
+                      <div
+                        role="button" tabIndex={0}
+                        onClick={() => { setSelectedBoardId(board.id); setActiveColTab("0") }}
+                        onKeyDown={(e) => { if (e.key === "Enter") { setSelectedBoardId(board.id); setActiveColTab("0") } }}
+                        className={`w-full cursor-pointer text-left p-3 pe-8 rounded-xl border transition-all ${
+                          selectedBoardId === board.id
+                            ? "bg-card border-primary ring-1 ring-primary shadow-sm"
+                            : "bg-card/50 border-border hover:border-primary/50 hover:bg-card"
+                        }`}
+                      >
+                        <h3 className="font-semibold text-sm line-clamp-1">{board.title}</h3>
+                        <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">"{board.prompt}"</p>
+                        <div className="flex items-center text-[10px] text-muted-foreground gap-1 mt-1">
+                          <Calendar className="w-3 h-3" />
+                          {format(new Date(board.createdAt), "MMM d, h:mm a")}
+                        </div>
                       </div>
-                      <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">"{board.prompt}"</p>
-                      <div className="flex items-center text-[10px] text-muted-foreground gap-1 mt-1">
-                        <Calendar className="w-3 h-3" />
-                        {format(new Date(board.createdAt), "MMM d, h:mm a")}
-                      </div>
+                      {/* Delete button sits above the card via absolute positioning — not nested inside div[role=button] */}
+                      <button
+                        aria-label="Delete board"
+                        className="absolute top-2 end-2 h-6 w-6 shrink-0 rounded flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover/card:opacity-100 focus-visible:opacity-100"
+                        onClick={(e) => handleDelete(board.id, e)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </motion.div>
                 ))}

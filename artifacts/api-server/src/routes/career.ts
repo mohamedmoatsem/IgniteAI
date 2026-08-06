@@ -13,6 +13,7 @@ import { z } from "zod/v4";
 
 const GetApplicationParams = z.object({ id: z.coerce.number().int().positive() });
 import { generateText } from "../lib/gemini";
+import { getUnifiedDataHubContext } from "../lib/datahub";
 
 const router: IRouter = Router();
 
@@ -104,6 +105,9 @@ router.post(
           recentBoards.map((b) => `- ${b.title}: "${b.prompt}"`).join("\n")
         : "";
 
+    // Inject DataHub: pre-seeded portfolio context (Aman, SyncSolar, Namaa)
+    const dataHubContext = getUnifiedDataHubContext();
+
     let parsedSummary: string;
     let skills: string;
     let experience: string;
@@ -111,27 +115,32 @@ router.post(
     try {
       parsedSummary = await generateText({
         systemInstruction:
-          "You are a Career Catalyst agent. Parse the resume below and, if available, " +
-          "merge it with the developer's active JumpStart projects to create a richer professional summary. " +
+          "You are a Career Catalyst agent. Parse the resume below and merge it with the developer's " +
+          "active JumpStart projects AND their verified DataHub portfolio (Aman, SyncSolar Systems, Namaa) " +
+          "to create a rich, credible professional summary. " +
           "Produce a concise 3-5 sentence professional summary that highlights technical strengths, " +
-          "relevant experience, and any real projects from the workspace. " +
-          "Write in third person. Do not hallucinate details not present in the input.",
-        prompt: `Resume text:\n${sourceText}${projectContext}`,
+          "real-world impact, and concrete project evidence from both the workspace and the DataHub portfolio. " +
+          "Write in third person. Reference specific project names from DataHub where relevant. " +
+          "Do not hallucinate details not present in the input.",
+        prompt: `Resume text:\n${sourceText}${projectContext}${dataHubContext}`,
       });
 
       skills = await generateText({
         systemInstruction:
-          "Extract a comma-separated list of the top 8-12 technical skills from this resume. " +
-          "Include programming languages, frameworks, tools, and platforms. Output only the comma-separated list.",
-        prompt: `Resume text:\n${sourceText}${projectContext}`,
+          "Extract a comma-separated list of the top 8-12 technical skills from this resume and project portfolio. " +
+          "Include programming languages, frameworks, tools, and platforms evidenced in both the resume and the DataHub projects. " +
+          "Output only the comma-separated list.",
+        prompt: `Resume text:\n${sourceText}${projectContext}${dataHubContext}`,
       });
 
       experience = await generateText({
         systemInstruction:
           "Summarize the work experience from this resume as a bulleted markdown list. " +
           "Each bullet: '- **Role** at **Company** (dates if visible): one-sentence description.' " +
-          "Max 6 bullets. If no formal experience found, note transferable projects or contributions.",
-        prompt: `Resume text:\n${sourceText}${projectContext}`,
+          "After formal experience, add a 'Notable Projects' section referencing the DataHub portfolio " +
+          "(Aman, SyncSolar Systems, Namaa) with a one-line impact statement each. " +
+          "Max 8 bullets total. Do not hallucinate.",
+        prompt: `Resume text:\n${sourceText}${projectContext}${dataHubContext}`,
       });
     } catch (err) {
       req.log.error({ err }, "Resume parsing failed");
@@ -213,18 +222,23 @@ router.post("/career/applications", async (req, res): Promise<void> => {
         recentBoards.map((b) => `- ${b.title}: ${b.prompt}`).join("\n")
       : "";
 
+  // Inject DataHub: pre-seeded portfolio context (Aman, SyncSolar, Namaa)
+  const dataHubContext = getUnifiedDataHubContext();
+
   let coverLetter: string;
   try {
     coverLetter = await generateText({
       systemInstruction:
-        "You are a Career Catalyst agent generating tailored, authentic cover letters for developers. " +
-        "Given a resume summary, skills, experience, project context, and a target role/company, " +
-        "write a professional cover letter (3-4 short paragraphs) that: " +
-        "1) Opens with genuine interest in the company/role, " +
-        "2) Highlights 2-3 relevant skills/experiences from the resume, " +
-        "3) Weaves in concrete project evidence from the JumpStart workspace, " +
-        "4) Closes with a confident call to action. " +
-        "Address it to 'Dear Hiring Manager' and keep it under 250 words.",
+        "You are a Career Catalyst agent generating hyper-personalised, highly credible cover letters for developers. " +
+        "You have access to the developer's verified project portfolio (DataHub). " +
+        "Write a professional cover letter (3-4 short paragraphs) that: " +
+        "1) Opens with genuine, specific interest in the company and role, " +
+        "2) Highlights 2-3 skills from the resume that directly match the job requirements, " +
+        "3) Weaves in at least one concrete DataHub project (Aman, SyncSolar Systems, or Namaa) " +
+        "   with a specific impact metric or technical detail that proves real-world capability, " +
+        "4) Closes with a confident, forward-looking call to action. " +
+        "Address it to 'Dear Hiring Manager'. Keep it under 280 words. " +
+        "Do not use generic phrases like 'I am passionate about'. Be specific and evidence-driven.",
       prompt:
         `Applying for: ${parsed.data.role} at ${parsed.data.company}\n` +
         (parsed.data.jobDescription
@@ -233,7 +247,8 @@ router.post("/career/applications", async (req, res): Promise<void> => {
         `\nResume summary: ${resume.parsedSummary}\n` +
         `Skills: ${resume.skills}\n` +
         `Experience: ${resume.experience}` +
-        projectContext,
+        projectContext +
+        dataHubContext,
     });
   } catch (err) {
     req.log.error({ err }, "Cover letter generation failed");
