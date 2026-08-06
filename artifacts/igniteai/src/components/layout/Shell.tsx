@@ -16,7 +16,7 @@ interface ShellProps {
 
 export function Shell({ children }: ShellProps) {
   const [location] = useLocation()
-  const { setting, setSetting, t } = useLanguage()
+  const { setting, setSetting, t, dir } = useLanguage()
 
   const navItems = [
     { href: "/", label: t("nav.jumpstart"), icon: LayoutDashboard },
@@ -26,7 +26,7 @@ export function Shell({ children }: ShellProps) {
   ]
 
   return (
-    <div className="min-h-screen bg-background flex flex-col md:flex-row w-full font-sans text-foreground">
+    <div dir={dir} className="min-h-screen bg-background flex flex-col md:flex-row w-full font-sans text-foreground">
       {/* Sidebar */}
       <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-border bg-card flex flex-col shrink-0 sticky top-0 z-10 md:h-screen">
         <div className="h-16 flex items-center px-6 border-b border-border font-bold text-lg tracking-tight">

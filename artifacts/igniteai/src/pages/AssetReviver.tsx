@@ -260,9 +260,10 @@ export default function AssetReviver() {
                       <Card>
                         <CardContent className="p-6 flex flex-col items-center gap-4">
                           <p className="text-sm text-muted-foreground">{t("assetReviver.cover")}</p>
-                          <div
+                          <img
+                            src={`data:image/svg+xml,${encodeURIComponent(selectedJob.coverSvg)}`}
+                            alt="AI-generated cover art"
                             className="rounded-xl overflow-hidden shadow-lg border border-border max-w-xs w-full"
-                            dangerouslySetInnerHTML={{ __html: selectedJob.coverSvg }}
                           />
                         </CardContent>
                       </Card>
