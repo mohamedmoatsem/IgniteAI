@@ -1,75 +1,105 @@
-# IgniteAI 🚀
-### The Hyper-Productivity Ecosystem for Developers & Technical Creators
+# 🚀 IgniteAI — Multi-Agent Developer, Career & Content Accelerator
 
-IgniteAI is an advanced, multi-lingual solo-founder production suite designed to accelerate the software development lifecycle, minimize cognitive overload, and optimize digital asset publishing—all fluidly optimized for mobile-first and desktop workflows.
+> **Empowering Developers, Founders, and Creators to Build Applications, Master Skills, and Launch AI-Powered Content Effortlessly.**
 
-Powered by Google's advanced generative models, IgniteAI orchestrates specialized AI agents to convert raw concepts into actionable development pipelines, assist in deep technical focus, and revive developer efforts into polished global commercial assets.
-
----
-
-## 🌟 Core Modules
-
-### 1. JumpStart (Concept-to-Execution Pipeline)
-* **The Problem:** Turning a big software or system idea into managed tasks causes immediate friction and choice fatigue.
-* **The Solution:** Generative orchestration turns any prompt into a fully structured, 5-stage Kanban board.
-* **Agentic Power (Delegate to Agent):** Features background execution routines. Developers can delegate any individual task ticket to a background Gemini Pro instance, which researches dependencies, writes starting code snippets, and automatically advances the ticket to "Ready for Review."
-* **Responsive Engine:** Dynamically refactors the multi-column board into an elegant, single-column stacked viewport or tab-based control on mobile devices to eliminate annoying horizontal scrolling.
-
-### 2. LiveLab (Context-Aware Focus Guard)
-* **The Problem:** Technical documentation and code debugging create context-switching traps, causing developers to lose deep focus in endless browser tabs.
-* **The Solution:** A split-screen, interactive workspace that explains code logic in real-time, eliminating friction.
-* **Focus Guard & Pomodoro:** Features an integrated 25/5 minute production timer. If a developer remains stuck or inactive on a code block for over 10 minutes, the guard sub-agent intervenes with a clean, low-latency visual architecture tip or schematic breakdown.
-
-### 3. Asset Reviver (Multimodal Yield Optimization)
-* **The Problem:** Valuable developer assets, code snippets, logs, and technical drafts sit idle in repositories rather than generating commercial value.
-* **The Solution:** A flexible extraction engine accepting direct text inputs or file uploads (`.xlsx`, `.csv`, `.md`, `.txt`) to generate multi-chapter guides, structured curriculums, and full marketing copy.
-* **Multimodal Pipelines:** Leverages multimodal capabilities to generate promotional metadata, optimized tags for Amazon KDP and Gumroad, course slides formatting, and live **Mermaid.js** system architecture diagrams.
+IgniteAI is a unified, multi-agent SaaS platform designed to streamline full-stack application creation, code debugging, asset generation, career alignment, and automated skill-to-video learning—fully localized for global markets with native RTL and dynamic i18n support.
 
 ---
 
-## 🌍 Global Localization Architecture
+## 🌟 Key Features & Core Modules
 
-IgniteAI is engineered for global scale, featuring a robust multi-lingual engine:
-* **UI Adaptability:** Dynamic drop-down localization supporting **Arabic (with seamless Right-to-Left RTL layouts), English, French, Spanish, and German**, alongside an automatic browser language detector.
-* **AI Realignment:** Deep system-level alignment forcing background LLM pipelines to interpret, analyze, and output technical schemas, marketing copy, and codebase explanations in the exact language selected by the target operator.
+IgniteAI integrates five core AI-powered modules into a single, cohesive ecosystem:
+
+### 1. ⚡ JumpStart (Idea to Blueprint)
+* Converts raw product ideas into structured, actionable development blueprints instantly.
+* Generates clear task boards (Kanban), tech stack recommendations, and execution timelines.
+* Designed with clean UI component hierarchies to prevent state conflicts and ensure smooth board interactions.
+
+### 2. 🧪 LiveLab (Real-Time Code & Debugging)
+* AI-driven code explainers and live refactoring suite powered by Google Gemini models.
+* Built-in Pomodoro productivity timer to keep developers focused during execution sessions.
+* Real-time snippet analysis with syntax feedback and safety checks.
+
+### 3. 🎨 Asset Reviver (Smart Content Transformation)
+* File ingestion engine supporting `.csv`, `.xlsx`, `.pdf`, `.txt`, and `.md`.
+* Automatically extracts and repurposes legacy content into marketing copy, documentation, or digital books.
+* Streamlined background processing with visual status badges.
+
+### 4. 💼 Career Catalyst (Context-Aware Job Matching)
+* ATS-friendly resume parsing paired with targeted Cover Letter generation.
+* **Unified DataHub Context Integration:** Dynamically injects verified real-world project portfolios—such as *Aman* (Crisis Psychological First Aid), *SyncSolar Systems* (IoT SCADA Monitoring), and *Namaa* (Smart Agriculture Ecosystem)—into generated job applications for hyper-personalized credibility.
+* Built-in Kanban application tracker to manage candidate pipeline states seamlessly.
+
+### 5. 🎓 EduPulse & YouTube AutoCreator Agent (EdTech & Automation)
+* **Autonomous Learning Roadmaps:** Transforms any study topic or technical field into a structured, step-by-step learning path.
+* **YouTube Knowledge Retrieval:** Queries the YouTube API to dynamically fetch, rank, and embed the highest-rated video tutorials for each specific roadmap unit.
+* **Faceless Video Creation Engine:** Synthesizes generated lesson notes into YouTube Shorts/Video scripts, SEO-optimized titles, tags, and visual scene prompts for automated channel monetization.
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## 🌐 Full i18n & RTL Support
 
-* **Frontend:** React, TypeScript, Vite, Tailwind CSS (Fully Responsive, RTL/LTR native).
-* **Backend & APIs:** Node.js, Fastify/Express, OpenAPI/Swagger YAML schemas, SQLite.
-* **AI Capabilities:** Google Gemini 1.5 Pro, Gemini 1.5 Flash, Gemini Omni Flash.
-* **Visual Assets:** Mermaid.js Diagram Engine.
-* **Package Management:** `pnpm`.
+* **Multi-Language Engine:** Built-in dynamic localization supporting **English, Arabic, French, Spanish, and German**.
+* **First-Class RTL Layouts:** Complete bidirectional layout enforcement (`dir="rtl"`, mirrored margins/paddings, and auto text-alignment) tailored for seamless Arabic UI rendering.
+* **Mobile Responsive Drawer:** Collapsible hamburger drawer navigation providing 100% usable canvas area on mobile viewports.
 
 ---
 
-## 🚀 Quick Start Guide
+## 🏗️ Technical Architecture & DataHub Integration
 
-### Prerequisites
-Make sure you have Node.js (v18+) and `pnpm` installed.
+┌──────────────────────────┐
+│ User Inputs / Resumes    │
+└────────────┬─────────────┘
+│
+▼
+┌──────────────────────────┐   ┌──────────────────────────┐   ┌──────────────────────────┐
+│ Unified DataHub Context  │──►│ Multi-Agent Gemini Engine│◄──│ i18n & RTL Middleware    │
+│ (Aman, SyncSolar, Namaa) │   └────────────┬─────────────┘   └──────────────────────────┘
+└──────────────────────────┘                │
+▼
+┌──────────────────────────┐
+│ Code, Blueprints, Career │
+│   & YouTube Automation   │
+└──────────────────────────┘
 
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/mohamedmoatsem/IgniteAI.git](https://github.com/mohamedmoatsem/IgniteAI.git)
-cd IgniteAI
+### Multi-Tenancy & Privacy Standard
+IgniteAI employs a **Multi-Tenant User Isolation Model**:
+* All project data, uploaded resumes, and user records are tightly scoped to the individual `userId`.
+* **DataHub Privacy:** Pre-seeded project profiles serve as demonstration context for new user sessions. Once a user creates or links their own projects, private user records isolate and override demo data completely.
 
-2. Install Dependencies
-pnpm install
+---
 
-3. Generate API Schemas
-​To compile and regenerate the type-safe API client files from the OpenAPI specification:
-pnpm run codegen
+## 💰 Monetization & Business Model
 
-4. Run the Development Server
-pnpm run dev
+IgniteAI is structured around a highly scalable B2C/B2B hybrid revenue system:
 
-Open your local environment or preview the application deployment directly via your connected cloud instance.
-🎖️ XPRIZE / Hackathon Roadmap
-[x] Core Multi-Module Architecture Setup (JumpStart, LiveLab, Asset Reviver)
-[x] OpenAPI Schema Definition & Type-Safe Generation
-[x] Custom Text Area Inputs & Multi-Format File Upload Processing
-[x] i18n Dropdown Internationalization Integration & Mobile Viewport CSS Tuning
-[ ] Active Background Agent Delegation Worker Refinement
-[ ] Local Sandbox Mermaid.js Rendering Core Extension
+* **Freemium Plan (Starter):** Free access to basic JumpStart blueprints, limited daily LiveLab executions, and standard application tracking.
+* **Pro Developer & Creator ($19/month):** Unlimited multi-agent invocations, priority Gemini API throughput, extended Asset Reviver file limits, deep DataHub context injections, and full YouTube script/automation exports.
+* **Enterprise & Institutional Tier:** Custom deployment for universities, coding bootcamps, and corporate teams requiring dedicated privacy pipelines, custom LLM fine-tuning, and team analytics.
+
+---
+
+## 🛠️ Tech Stack
+
+* **Frontend:** React, TypeScript, Tailwind CSS, Lucide Icons, Radix UI.
+* **AI & Intelligence Engine:** Google Gemini API (Multi-Agent Workflows).
+* **Integrations:** YouTube Data API v3 (Educational Video Linking).
+* **Internationalization:** Custom lightweight i18n framework with full RTL support.
+* **Deployment & Environment:** Replit, Node.js API Server.
+
+---
+
+## 🚀 Getting Started
+
+1. **Clone the Repository:**
+   ```bash
+   git clone [https://github.com/your-username/ignite-ai.git](https://github.com/your-username/ignite-ai.git)
+   cd ignite-ai
+   2.Install Dependencies:
+   npm install
+3.Configure Environment Variables:
+Create a .env file in the root directory and set your API keys:
+GEMINI_API_KEY=your_gemini_api_key_here
+YOUTUBE_API_KEY=your_youtube_api_key_here
+4.Run Development Server:
+npm run dev
