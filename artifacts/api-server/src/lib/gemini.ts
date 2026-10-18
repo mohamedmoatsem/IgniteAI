@@ -1,4 +1,7 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import {
+  GoogleGenerativeAI,
+  type ResponseSchema,
+} from "@google/generative-ai";
 import { logger } from "./logger";
 
 const apiKey = process.env["GEMINI_API_KEY"];
@@ -10,6 +13,13 @@ if (!apiKey) {
 }
 
 const genAI = new GoogleGenerativeAI(apiKey);
+
+export class GeminiJsonParseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "GeminiJsonParseError";
+  }
+}
 
 /**
  * Extracts the first top-level JSON object or array from a text blob,
@@ -60,6 +70,37 @@ export async function generateJson<T>(params: {
   } catch (err) {
     logger.error({ err, text }, "Failed to parse Gemini JSON response");
     throw new Error("Gemini returned a response that could not be parsed");
+  }
+}
+
+/**
+ * Structured JSON generation for routes that require a provider-enforced
+ * response schema. Existing generateJson callers keep their current behavior.
+ */
+export async function generateJsonWithSchema<T>(params: {
+  prompt: string;
+  systemInstruction: string;
+  responseSchema: ResponseSchema;
+}): Promise<T> {
+  const model = genAI.getGenerativeModel({
+    model: "gemini-flash-lite-latest",
+    systemInstruction: params.systemInstruction,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: params.responseSchema,
+    },
+  });
+
+  const result = await withRetry(() => model.generateContent(params.prompt));
+  const text = result.response.text();
+
+  try {
+    return JSON.parse(extractJson(text)) as T;
+  } catch (err) {
+    logger.error({ err }, "Failed to parse schema-constrained Gemini JSON response");
+    throw new GeminiJsonParseError(
+      "Gemini returned a response that could not be parsed",
+    );
   }
 }
 

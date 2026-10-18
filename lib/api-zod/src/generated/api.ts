@@ -239,6 +239,60 @@ export const UploadResumeResponse = zod.object({
 
 
 /**
+ * @summary Score a resume against a job description
+ */
+export const scoreAtsResumeBodyJobDescriptionMin = 40;
+export const scoreAtsResumeBodyJobDescriptionMax = 20000;
+
+export const scoreAtsResumeBodyResumeTextMin = 50;
+export const scoreAtsResumeBodyResumeTextMax = 50000;
+
+
+
+
+export const ScoreAtsResumeBody = zod.object({
+  "jobDescription": zod.string().min(scoreAtsResumeBodyJobDescriptionMin).max(scoreAtsResumeBodyJobDescriptionMax),
+  "resumeText": zod.string().min(scoreAtsResumeBodyResumeTextMin).max(scoreAtsResumeBodyResumeTextMax).optional().describe('Pasted resume text; provide this or resumeId, but not both.'),
+  "resumeId": zod.number().min(1).optional().describe('Existing Career Catalyst resume; provide this or resumeText, but not both.'),
+  "uiLanguage": zod.enum(['en', 'ar', 'fr', 'es', 'de']).optional().describe('Language for generated category issues and top fixes.')
+})
+
+export const scoreAtsResumeResponseScoreMin = 0;
+export const scoreAtsResumeResponseScoreMax = 100;
+
+export const scoreAtsResumeResponseCategoriesItemScoreMin = 0;
+export const scoreAtsResumeResponseCategoriesItemScoreMax = 100;
+
+export const scoreAtsResumeResponseCategoriesItemWeightMax = 100;
+
+export const scoreAtsResumeResponseCategoriesItemIssuesItemMin = 8;
+
+export const scoreAtsResumeResponseCategoriesItemIssuesMax = 5;
+
+export const scoreAtsResumeResponseCategoriesMin = 5;
+export const scoreAtsResumeResponseCategoriesMax = 5;
+
+export const scoreAtsResumeResponseTopFixesItemMin = 8;
+
+export const scoreAtsResumeResponseTopFixesMin = 3;
+export const scoreAtsResumeResponseTopFixesMax = 5;
+
+
+
+export const ScoreAtsResumeResponse = zod.object({
+  "score": zod.number().min(scoreAtsResumeResponseScoreMin).max(scoreAtsResumeResponseScoreMax),
+  "categories": zod.array(zod.object({
+  "id": zod.enum(['keyword_match', 'formatting_parseability', 'section_completeness', 'action_verbs_impact', 'length_readability']),
+  "label": zod.enum(['Keyword Match', 'Formatting & Parseability', 'Section Completeness', 'Action Verbs & Impact', 'Length & Readability']),
+  "score": zod.number().min(scoreAtsResumeResponseCategoriesItemScoreMin).max(scoreAtsResumeResponseCategoriesItemScoreMax),
+  "weight": zod.number().min(1).max(scoreAtsResumeResponseCategoriesItemWeightMax),
+  "issues": zod.array(zod.string().min(scoreAtsResumeResponseCategoriesItemIssuesItemMin)).min(1).max(scoreAtsResumeResponseCategoriesItemIssuesMax)
+})).min(scoreAtsResumeResponseCategoriesMin).max(scoreAtsResumeResponseCategoriesMax),
+  "topFixes": zod.array(zod.string().min(scoreAtsResumeResponseTopFixesItemMin)).min(scoreAtsResumeResponseTopFixesMin).max(scoreAtsResumeResponseTopFixesMax)
+})
+
+
+/**
  * @summary Get a parsed resume by id
  */
 export const GetResumeParams = zod.object({

@@ -124,6 +124,103 @@ export interface UpdateApplicationBody {
   notes?: string;
 }
 
+/**
+ * Language for generated category issues and top fixes.
+ */
+export type AtsScoreInputUiLanguage = typeof AtsScoreInputUiLanguage[keyof typeof AtsScoreInputUiLanguage];
+
+
+export const AtsScoreInputUiLanguage = {
+  en: 'en',
+  ar: 'ar',
+  fr: 'fr',
+  es: 'es',
+  de: 'de',
+} as const;
+
+export interface AtsScoreInput {
+  /**
+     * @minLength 40
+     * @maxLength 20000
+     */
+  jobDescription: string;
+  /**
+     * Pasted resume text; provide this or resumeId, but not both.
+     * @minLength 50
+     * @maxLength 50000
+     */
+  resumeText?: string;
+  /**
+     * Existing Career Catalyst resume; provide this or resumeText, but not both.
+     * @minimum 1
+     */
+  resumeId?: number;
+  /** Language for generated category issues and top fixes. */
+  uiLanguage?: AtsScoreInputUiLanguage;
+}
+
+export type AtsScoreCategoryId = typeof AtsScoreCategoryId[keyof typeof AtsScoreCategoryId];
+
+
+export const AtsScoreCategoryId = {
+  keyword_match: 'keyword_match',
+  formatting_parseability: 'formatting_parseability',
+  section_completeness: 'section_completeness',
+  action_verbs_impact: 'action_verbs_impact',
+  length_readability: 'length_readability',
+} as const;
+
+export type AtsScoreCategoryLabel = typeof AtsScoreCategoryLabel[keyof typeof AtsScoreCategoryLabel];
+
+
+export const AtsScoreCategoryLabel = {
+  Keyword_Match: 'Keyword Match',
+  'Formatting_&_Parseability': 'Formatting & Parseability',
+  Section_Completeness: 'Section Completeness',
+  'Action_Verbs_&_Impact': 'Action Verbs & Impact',
+  'Length_&_Readability': 'Length & Readability',
+} as const;
+
+export interface AtsScoreCategory {
+  id: AtsScoreCategoryId;
+  label: AtsScoreCategoryLabel;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  score: number;
+  /**
+     * @minimum 1
+     * @maximum 100
+     */
+  weight: number;
+  /**
+     * @minItems 1
+     * @maxItems 5
+     * @items.minLength 8
+     */
+  issues: string[];
+}
+
+export interface AtsScoreResult {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  score: number;
+  /**
+     * @minItems 5
+     * @maxItems 5
+     */
+  categories: AtsScoreCategory[];
+  /**
+     * @minItems 3
+     * @maxItems 5
+     * @items.minLength 8
+     */
+  topFixes: string[];
+}
+
 export type AssetJobStatus = typeof AssetJobStatus[keyof typeof AssetJobStatus];
 
 

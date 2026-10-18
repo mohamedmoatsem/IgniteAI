@@ -24,6 +24,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { format } from "date-fns"
 import ReactMarkdown from "react-markdown"
 import { useLanguage } from "@/lib/i18n"
+import { AtsScorePanel } from "@/pages/AtsScorePanel"
 
 type AppStatus = "found" | "applying" | "submitted"
 
@@ -270,6 +271,11 @@ export default function CareerCatalyst() {
               </Card>
             </motion.div>
           )}
+
+          <AtsScorePanel
+            selectedResumeId={selectedResumeId}
+            selectedResumeName={resumes?.find((resume) => resume.id === selectedResumeId)?.filename}
+          />
 
           {/* Applications Kanban */}
           <div>

@@ -268,6 +268,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /career/ats-score:
+    post:
+      operationId: scoreAtsResume
+      tags: [career]
+      summary: Score a resume against a job description
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AtsScoreInput"
+      responses:
+        "200":
+          description: ATS score and category breakdown
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AtsScoreResult"
+        "400":
+          description: Invalid input or unknown resume
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Gemini service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /career/resumes/{id}:
     get:
       operationId: getResume
@@ -595,6 +625,88 @@ components:
           $ref: "#/components/schemas/JobApplicationStatus"
         notes:
           type: string
+    AtsScoreInput:
+      type: object
+      additionalProperties: false
+      required: [jobDescription]
+      properties:
+        jobDescription:
+          type: string
+          minLength: 40
+          maxLength: 20000
+        resumeText:
+          type: string
+          minLength: 50
+          maxLength: 50000
+          description: Pasted resume text; provide this or resumeId, but not both.
+        resumeId:
+          type: integer
+          minimum: 1
+          description: Existing Career Catalyst resume; provide this or resumeText, but not both.
+        uiLanguage:
+          type: string
+          enum: [en, ar, fr, es, de]
+          description: Language for generated category issues and top fixes.
+    AtsScoreCategoryId:
+      type: string
+      enum:
+        - keyword_match
+        - formatting_parseability
+        - section_completeness
+        - action_verbs_impact
+        - length_readability
+    AtsScoreCategory:
+      type: object
+      additionalProperties: false
+      required: [id, label, score, weight, issues]
+      properties:
+        id:
+          $ref: "#/components/schemas/AtsScoreCategoryId"
+        label:
+          type: string
+          enum:
+            - Keyword Match
+            - Formatting & Parseability
+            - Section Completeness
+            - Action Verbs & Impact
+            - Length & Readability
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        weight:
+          type: integer
+          minimum: 1
+          maximum: 100
+        issues:
+          type: array
+          minItems: 1
+          maxItems: 5
+          items:
+            type: string
+            minLength: 8
+    AtsScoreResult:
+      type: object
+      additionalProperties: false
+      required: [score, categories, topFixes]
+      properties:
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        categories:
+          type: array
+          minItems: 5
+          maxItems: 5
+          items:
+            $ref: "#/components/schemas/AtsScoreCategory"
+        topFixes:
+          type: array
+          minItems: 3
+          maxItems: 5
+          items:
+            type: string
+            minLength: 8
     AssetJobStatus:
       type: string
       enum: [pending, processing, completed, failed]

@@ -88,6 +88,37 @@ type TranslationKey =
   | "career.submitted"
   | "career.letter"
   | "career.remoteBadge"
+  | "career.ats.title"
+  | "career.ats.subtitle"
+  | "career.ats.jobDescription"
+  | "career.ats.jobDescriptionPlaceholder"
+  | "career.ats.resumeText"
+  | "career.ats.resumeTextPlaceholder"
+  | "career.ats.resumeSourceHelp"
+  | "career.ats.run"
+  | "career.ats.running"
+  | "career.ats.scoreLabel"
+  | "career.ats.scoreOutOf"
+  | "career.ats.breakdown"
+  | "career.ats.issues"
+  | "career.ats.topFixes"
+  | "career.ats.emptyTitle"
+  | "career.ats.emptyDescription"
+  | "career.ats.error"
+  | "career.ats.inputRequired"
+  | "career.ats.fallbackNotice"
+  | "career.ats.keywordMatch"
+  | "career.ats.formatting"
+  | "career.ats.sections"
+  | "career.ats.actionImpact"
+  | "career.ats.lengthReadability"
+  | "career.ats.fallbackKeyword"
+  | "career.ats.fallbackFormatting"
+  | "career.ats.fallbackSections"
+  | "career.ats.fallbackActionImpact"
+  | "career.ats.fallbackLength"
+  | "career.ats.jobDescriptionTooShort"
+  | "career.ats.resumeTooShort"
 
 type Translations = Record<TranslationKey, string>
 
@@ -166,6 +197,37 @@ const en: Translations = {
   "career.submitted": "Submitted",
   "career.letter": "Letter",
   "career.remoteBadge": "Remote",
+  "career.ats.title": "ATS Score",
+  "career.ats.subtitle": "Compare your resume with a job description and get targeted, actionable feedback.",
+  "career.ats.jobDescription": "Job description",
+  "career.ats.jobDescriptionPlaceholder": "Paste the full job description here…",
+  "career.ats.resumeText": "Resume text",
+  "career.ats.resumeTextPlaceholder": "Paste your resume text here, or select an uploaded resume from the left panel.",
+  "career.ats.resumeSourceHelp": "Use the selected resume from the left panel when this field is empty.",
+  "career.ats.run": "Analyze ATS match",
+  "career.ats.running": "Analyzing resume…",
+  "career.ats.scoreLabel": "ATS compatibility",
+  "career.ats.scoreOutOf": "out of 100",
+  "career.ats.breakdown": "Score breakdown",
+  "career.ats.issues": "Findings",
+  "career.ats.topFixes": "Highest-impact fixes",
+  "career.ats.emptyTitle": "Ready when you are",
+  "career.ats.emptyDescription": "Add a job description and resume to see an ATS score with specific recommendations.",
+  "career.ats.error": "We couldn't analyze this resume. Please try again.",
+  "career.ats.inputRequired": "Add a job description and either paste resume text or select an uploaded resume.",
+  "career.ats.fallbackNotice": "The AI response could not be validated. This is a safe fallback, not a reliable ATS score. Please retry.",
+  "career.ats.keywordMatch": "Keyword Match",
+  "career.ats.formatting": "Formatting & Parseability",
+  "career.ats.sections": "Section Completeness",
+  "career.ats.actionImpact": "Action Verbs & Impact",
+  "career.ats.lengthReadability": "Length & Readability",
+  "career.ats.fallbackKeyword": "Retry to compare resume keywords with the job description.",
+  "career.ats.fallbackFormatting": "Retry with a text-based resume to assess ATS parseability.",
+  "career.ats.fallbackSections": "Retry to check which standard resume sections are present.",
+  "career.ats.fallbackActionImpact": "Retry to assess action verbs and measurable results in your bullets.",
+  "career.ats.fallbackLength": "Retry to assess resume length and readability.",
+  "career.ats.jobDescriptionTooShort": "Paste at least 40 characters of the job description.",
+  "career.ats.resumeTooShort": "Paste at least 50 characters of resume text.",
 }
 
 const ar: Translations = {
@@ -243,6 +305,37 @@ const ar: Translations = {
   "career.submitted": "تم الإرسال",
   "career.letter": "الرسالة",
   "career.remoteBadge": "عن بُعد",
+  "career.ats.title": "درجة توافق ATS",
+  "career.ats.subtitle": "قارن سيرتك الذاتية بوصف الوظيفة واحصل على ملاحظات عملية ومحددة.",
+  "career.ats.jobDescription": "وصف الوظيفة",
+  "career.ats.jobDescriptionPlaceholder": "الصق وصف الوظيفة الكامل هنا...",
+  "career.ats.resumeText": "نص السيرة الذاتية",
+  "career.ats.resumeTextPlaceholder": "الصق نص سيرتك الذاتية هنا، أو اختر سيرة رفعتها من اللوحة اليسرى.",
+  "career.ats.resumeSourceHelp": "سيتم استخدام السيرة المحددة في اللوحة اليسرى إذا تركت هذا الحقل فارغًا.",
+  "career.ats.run": "تحليل توافق ATS",
+  "career.ats.running": "جارٍ تحليل السيرة الذاتية...",
+  "career.ats.scoreLabel": "توافق السيرة مع أنظمة ATS",
+  "career.ats.scoreOutOf": "من 100",
+  "career.ats.breakdown": "تفصيل الدرجة",
+  "career.ats.issues": "ملاحظات",
+  "career.ats.topFixes": "أهم التحسينات",
+  "career.ats.emptyTitle": "جاهز عندما تكون مستعدًا",
+  "career.ats.emptyDescription": "أضف وصف الوظيفة والسيرة الذاتية لعرض الدرجة مع توصيات محددة.",
+  "career.ats.error": "تعذر تحليل هذه السيرة الذاتية. حاول مرة أخرى.",
+  "career.ats.inputRequired": "أضف وصف الوظيفة والصق نص السيرة الذاتية أو اختر سيرة رفعتها.",
+  "career.ats.fallbackNotice": "تعذر التحقق من استجابة الذكاء الاصطناعي. هذه نتيجة احتياطية وليست درجة موثوقة. يرجى إعادة المحاولة.",
+  "career.ats.keywordMatch": "مطابقة الكلمات المفتاحية",
+  "career.ats.formatting": "التنسيق وقابلية القراءة آليًا",
+  "career.ats.sections": "اكتمال الأقسام",
+  "career.ats.actionImpact": "أفعال الإنجاز والأثر",
+  "career.ats.lengthReadability": "الطول وسهولة القراءة",
+  "career.ats.fallbackKeyword": "أعد التحليل لمقارنة كلمات السيرة بوصف الوظيفة.",
+  "career.ats.fallbackFormatting": "أعد التحليل باستخدام نص السيرة لتقييم قابلية قراءتها آليًا.",
+  "career.ats.fallbackSections": "أعد التحليل للتحقق من وجود أقسام السيرة القياسية.",
+  "career.ats.fallbackActionImpact": "أعد التحليل لتقييم أفعال الإنجاز والنتائج القابلة للقياس.",
+  "career.ats.fallbackLength": "أعد التحليل لتقييم طول السيرة وسهولة قراءتها.",
+  "career.ats.jobDescriptionTooShort": "الصق 40 حرفًا على الأقل من وصف الوظيفة.",
+  "career.ats.resumeTooShort": "الصق 50 حرفًا على الأقل من نص السيرة الذاتية.",
 }
 
 const fr: Translations = {
@@ -320,6 +413,37 @@ const fr: Translations = {
   "career.submitted": "Envoyée",
   "career.letter": "Lettre",
   "career.remoteBadge": "Télétravail",
+  "career.ats.title": "Score ATS",
+  "career.ats.subtitle": "Comparez votre CV à une offre d'emploi et obtenez des conseils ciblés et concrets.",
+  "career.ats.jobDescription": "Description du poste",
+  "career.ats.jobDescriptionPlaceholder": "Collez ici l'offre d'emploi complète…",
+  "career.ats.resumeText": "Texte du CV",
+  "career.ats.resumeTextPlaceholder": "Collez votre CV ici ou sélectionnez un CV importé dans le panneau de gauche.",
+  "career.ats.resumeSourceHelp": "Le CV sélectionné à gauche sera utilisé si ce champ est vide.",
+  "career.ats.run": "Analyser la compatibilité ATS",
+  "career.ats.running": "Analyse du CV…",
+  "career.ats.scoreLabel": "Compatibilité ATS",
+  "career.ats.scoreOutOf": "sur 100",
+  "career.ats.breakdown": "Détail du score",
+  "career.ats.issues": "Constats",
+  "career.ats.topFixes": "Améliorations prioritaires",
+  "career.ats.emptyTitle": "Prêt quand vous l'êtes",
+  "career.ats.emptyDescription": "Ajoutez une offre et un CV pour obtenir un score ATS et des recommandations précises.",
+  "career.ats.error": "Impossible d'analyser ce CV. Veuillez réessayer.",
+  "career.ats.inputRequired": "Ajoutez une offre et collez un CV ou sélectionnez un CV importé.",
+  "career.ats.fallbackNotice": "La réponse de l'IA n'a pas pu être validée. Ce résultat de secours n'est pas un score fiable. Veuillez réessayer.",
+  "career.ats.keywordMatch": "Correspondance des mots-clés",
+  "career.ats.formatting": "Mise en forme et lisibilité ATS",
+  "career.ats.sections": "Sections complètes",
+  "career.ats.actionImpact": "Verbes d'action et impact",
+  "career.ats.lengthReadability": "Longueur et lisibilité",
+  "career.ats.fallbackKeyword": "Relancez l'analyse pour comparer les mots-clés du CV à l'offre.",
+  "career.ats.fallbackFormatting": "Relancez avec un CV textuel pour évaluer sa lisibilité ATS.",
+  "career.ats.fallbackSections": "Relancez l'analyse pour vérifier les sections standards du CV.",
+  "career.ats.fallbackActionImpact": "Relancez l'analyse pour évaluer les verbes d'action et les résultats mesurables.",
+  "career.ats.fallbackLength": "Relancez l'analyse pour évaluer la longueur et la lisibilité du CV.",
+  "career.ats.jobDescriptionTooShort": "Collez au moins 40 caractères de description de poste.",
+  "career.ats.resumeTooShort": "Collez au moins 50 caractères de texte de CV.",
 }
 
 const es: Translations = {
@@ -397,6 +521,37 @@ const es: Translations = {
   "career.submitted": "Enviada",
   "career.letter": "Carta",
   "career.remoteBadge": "Remoto",
+  "career.ats.title": "Puntuación ATS",
+  "career.ats.subtitle": "Compara tu CV con una oferta y recibe sugerencias concretas y específicas.",
+  "career.ats.jobDescription": "Descripción del puesto",
+  "career.ats.jobDescriptionPlaceholder": "Pega aquí la descripción completa del puesto…",
+  "career.ats.resumeText": "Texto del CV",
+  "career.ats.resumeTextPlaceholder": "Pega aquí tu CV o selecciona uno que hayas subido en el panel izquierdo.",
+  "career.ats.resumeSourceHelp": "Si este campo está vacío, se usará el CV seleccionado a la izquierda.",
+  "career.ats.run": "Analizar compatibilidad ATS",
+  "career.ats.running": "Analizando el CV…",
+  "career.ats.scoreLabel": "Compatibilidad ATS",
+  "career.ats.scoreOutOf": "de 100",
+  "career.ats.breakdown": "Desglose de puntuación",
+  "career.ats.issues": "Hallazgos",
+  "career.ats.topFixes": "Mejoras prioritarias",
+  "career.ats.emptyTitle": "Listo cuando quieras",
+  "career.ats.emptyDescription": "Añade una oferta y un CV para ver una puntuación ATS con recomendaciones específicas.",
+  "career.ats.error": "No se pudo analizar este CV. Inténtalo de nuevo.",
+  "career.ats.inputRequired": "Añade una oferta y pega un CV o selecciona uno que hayas subido.",
+  "career.ats.fallbackNotice": "No se pudo validar la respuesta de IA. Este resultado seguro no es una puntuación fiable. Vuelve a intentarlo.",
+  "career.ats.keywordMatch": "Coincidencia de palabras clave",
+  "career.ats.formatting": "Formato y lectura ATS",
+  "career.ats.sections": "Secciones completas",
+  "career.ats.actionImpact": "Verbos de acción e impacto",
+  "career.ats.lengthReadability": "Extensión y legibilidad",
+  "career.ats.fallbackKeyword": "Vuelve a analizar para comparar las palabras clave del CV con la oferta.",
+  "career.ats.fallbackFormatting": "Vuelve a intentarlo con un CV de texto para evaluar su lectura ATS.",
+  "career.ats.fallbackSections": "Vuelve a analizar para comprobar las secciones estándar del CV.",
+  "career.ats.fallbackActionImpact": "Vuelve a analizar para evaluar verbos de acción y resultados medibles.",
+  "career.ats.fallbackLength": "Vuelve a analizar para evaluar la extensión y legibilidad del CV.",
+  "career.ats.jobDescriptionTooShort": "Pega al menos 40 caracteres de la descripción del puesto.",
+  "career.ats.resumeTooShort": "Pega al menos 50 caracteres del texto del CV.",
 }
 
 const de: Translations = {
@@ -474,6 +629,37 @@ const de: Translations = {
   "career.submitted": "Eingereicht",
   "career.letter": "Anschreiben",
   "career.remoteBadge": "Remote",
+  "career.ats.title": "ATS-Bewertung",
+  "career.ats.subtitle": "Vergleiche deinen Lebenslauf mit einer Stellenanzeige und erhalte konkrete, gezielte Hinweise.",
+  "career.ats.jobDescription": "Stellenbeschreibung",
+  "career.ats.jobDescriptionPlaceholder": "Füge hier die vollständige Stellenbeschreibung ein…",
+  "career.ats.resumeText": "Lebenslauftext",
+  "career.ats.resumeTextPlaceholder": "Füge deinen Lebenslauf hier ein oder wähle links einen hochgeladenen Lebenslauf aus.",
+  "career.ats.resumeSourceHelp": "Wenn dieses Feld leer ist, wird der links ausgewählte Lebenslauf verwendet.",
+  "career.ats.run": "ATS-Abgleich analysieren",
+  "career.ats.running": "Lebenslauf wird analysiert…",
+  "career.ats.scoreLabel": "ATS-Kompatibilität",
+  "career.ats.scoreOutOf": "von 100",
+  "career.ats.breakdown": "Bewertungsübersicht",
+  "career.ats.issues": "Ergebnisse",
+  "career.ats.topFixes": "Wichtigste Verbesserungen",
+  "career.ats.emptyTitle": "Bereit, wenn du es bist",
+  "career.ats.emptyDescription": "Füge eine Stellenanzeige und einen Lebenslauf hinzu, um eine ATS-Bewertung mit konkreten Empfehlungen zu erhalten.",
+  "career.ats.error": "Der Lebenslauf konnte nicht analysiert werden. Bitte erneut versuchen.",
+  "career.ats.inputRequired": "Füge eine Stellenanzeige hinzu und füge einen Lebenslauftext ein oder wähle einen hochgeladenen Lebenslauf.",
+  "career.ats.fallbackNotice": "Die KI-Antwort konnte nicht validiert werden. Dieses sichere Ersatzresultat ist keine zuverlässige Bewertung. Bitte erneut versuchen.",
+  "career.ats.keywordMatch": "Keyword-Übereinstimmung",
+  "career.ats.formatting": "Formatierung und ATS-Lesbarkeit",
+  "career.ats.sections": "Vollständigkeit der Abschnitte",
+  "career.ats.actionImpact": "Aktionsverben und Wirkung",
+  "career.ats.lengthReadability": "Länge und Lesbarkeit",
+  "career.ats.fallbackKeyword": "Starte erneut, um Keywords im Lebenslauf mit der Stellenanzeige abzugleichen.",
+  "career.ats.fallbackFormatting": "Starte mit einem Text-Lebenslauf erneut, um die ATS-Lesbarkeit zu prüfen.",
+  "career.ats.fallbackSections": "Starte erneut, um die üblichen Lebenslaufabschnitte zu prüfen.",
+  "career.ats.fallbackActionImpact": "Starte erneut, um Aktionsverben und messbare Ergebnisse zu bewerten.",
+  "career.ats.fallbackLength": "Starte erneut, um Länge und Lesbarkeit des Lebenslaufs zu bewerten.",
+  "career.ats.jobDescriptionTooShort": "Füge mindestens 40 Zeichen der Stellenbeschreibung ein.",
+  "career.ats.resumeTooShort": "Füge mindestens 50 Zeichen des Lebenslaufs ein.",
 }
 
 const DICTIONARIES: Record<LanguageCode, Translations> = { en, ar, fr, es, de }

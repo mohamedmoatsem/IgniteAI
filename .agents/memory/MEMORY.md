@@ -1,1 +1,2 @@
 - [Gemini model names via own API key](gemini-direct-api-key.md) — versioned model IDs (2.5-pro/flash) are unreliable (404/quota-0/503); use alias `gemini-flash-lite-latest` and retry with long backoff.
+- [ATS history and authentication](ats-history-auth.md) — ATS results stay in the current session until real account authentication is integrated with payments; do not add anonymous identity.

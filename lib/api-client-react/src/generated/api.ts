@@ -22,6 +22,8 @@ import type {
 import type {
   AssetJob,
   AssetJobUpload,
+  AtsScoreInput,
+  AtsScoreResult,
   Board,
   BoardInput,
   CreateApplicationBody,
@@ -891,6 +893,77 @@ export const useUploadResume = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getUploadResumeMutationOptions(options));
+    }
+
+export const getScoreAtsResumeUrl = () => {
+
+
+
+
+  return `/api/career/ats-score`
+}
+
+/**
+ * @summary Score a resume against a job description
+ */
+export const scoreAtsResume = async (atsScoreInput: AtsScoreInput, options?: RequestInit): Promise<AtsScoreResult> => {
+
+  return customFetch<AtsScoreResult>(getScoreAtsResumeUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(atsScoreInput)
+  }
+);}
+
+
+
+
+
+export const getScoreAtsResumeMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scoreAtsResume>>, TError,{data: BodyType<AtsScoreInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof scoreAtsResume>>, TError,{data: BodyType<AtsScoreInput>}, TContext> => {
+
+const mutationKey = ['scoreAtsResume'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scoreAtsResume>>, {data: BodyType<AtsScoreInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  scoreAtsResume(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScoreAtsResumeMutationResult = NonNullable<Awaited<ReturnType<typeof scoreAtsResume>>>
+    export type ScoreAtsResumeMutationBody = BodyType<AtsScoreInput>
+    export type ScoreAtsResumeMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Score a resume against a job description
+ */
+export const useScoreAtsResume = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scoreAtsResume>>, TError,{data: BodyType<AtsScoreInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof scoreAtsResume>>,
+        TError,
+        {data: BodyType<AtsScoreInput>},
+        TContext
+      > => {
+      return useMutation(getScoreAtsResumeMutationOptions(options));
     }
 
 export const getGetResumeUrl = (id: number,) => {
