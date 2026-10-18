@@ -18,8 +18,10 @@ import { generateJsonWithSchema, generateText, GeminiJsonParseError } from "../l
 import { getUnifiedDataHubContext } from "../lib/datahub";
 import {
   ATS_CATEGORIES,
+  ATS_ACTION_VERB_STARTERS,
   ATS_GEMINI_RESPONSE_SCHEMA,
   createAtsScoreFallback,
+  getAtsScoreValidationFailure,
   validateAtsScoreResult,
 } from "../lib/ats-score";
 import {
@@ -253,7 +255,9 @@ router.post("/career/ats-score", async (req, res): Promise<void> => {
     es: "Spanish",
     de: "German",
   } as const;
-  const outputLanguage = languageNames[parsed.data.uiLanguage ?? "en"];
+  const uiLanguage = parsed.data.uiLanguage ?? "en";
+  const outputLanguage = languageNames[uiLanguage];
+  const actionVerbStarters = ATS_ACTION_VERB_STARTERS[uiLanguage];
   const categoryInstructions = ATS_CATEGORIES.map(
     (category) =>
       `- ${category.id} / ${category.label}: weight ${category.weight}.`,
@@ -265,7 +269,7 @@ router.post("/career/ats-score", async (req, res): Promise<void> => {
     "Return ONLY valid JSON matching the supplied response schema. Do not include markdown fences, commentary, or extra properties.",
     `Use exactly these five categories, each exactly once, with the exact label and weight shown:\n${categoryInstructions}`,
     "Give each category a score from 0 to 100. The overall score must be the rounded weighted average using the listed weights.",
-    "Every category must contain at least one specific, actionable issue grounded in the supplied resume or job description. Phrase at least one issue per category as a concrete change instruction beginning with an action verb (for example: Add, Include, Move, Rewrite, Quantify, Shorten, or the equivalent in the output language). Cite a concrete keyword, section, formatting signal, weak bullet, missing metric, or length/readability concern. Never use generic advice such as 'improve your resume'.",
+    `In every category, make the first issue a specific, actionable change grounded in the supplied text. Start it with one exact imperative verb from this list for ${outputLanguage}: ${actionVerbStarters.join(", ")}. Mention the concrete keyword, section, formatting signal, weak bullet, missing metric, or length/readability concern being addressed. Each issue must be at least 25 characters. Never use generic advice such as 'improve your resume'.`,
     "Provide 3 to 5 prioritized, concrete fixes. Do not invent credentials, experience, metrics, or resume details.",
     `Write issues and topFixes in ${outputLanguage}; keep the required category labels in English exactly as provided.`,
   ].join(" ");
@@ -282,9 +286,15 @@ router.post("/career/ats-score", async (req, res): Promise<void> => {
         }),
     });
 
-    const validated = validateAtsScoreResult(modelResult);
+    const validationFailure = getAtsScoreValidationFailure(modelResult);
+    const validated = validationFailure
+      ? null
+      : validateAtsScoreResult(modelResult);
     if (!validated) {
       req.log.warn(
+        {
+          validationFailure: validationFailure ?? "response_validation_failed",
+        },
         "Gemini ATS score did not satisfy the strict response contract; returning safe fallback",
       );
       res.json(ScoreAtsResumeResponse.parse(createAtsScoreFallback()));

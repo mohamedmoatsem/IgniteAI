@@ -235,6 +235,117 @@ const ARABIC_ACTION_WORDS = [
   "أبرز",
 ];
 
+export const ATS_ACTION_VERB_STARTERS = {
+  en: [
+    "Add",
+    "Include",
+    "Insert",
+    "Mention",
+    "Highlight",
+    "Replace",
+    "Quantify",
+    "Move",
+    "Remove",
+    "Rewrite",
+    "Specify",
+    "Clarify",
+    "State",
+    "List",
+    "Name",
+    "Define",
+    "Create",
+    "Organize",
+    "Separate",
+    "Split",
+    "Combine",
+    "Reduce",
+    "Trim",
+    "Condense",
+    "Cut",
+    "Format",
+    "Reformat",
+    "Tailor",
+    "Reorder",
+    "Shorten",
+    "Expand",
+    "Align",
+    "Measure",
+    "Demonstrate",
+    "Provide",
+    "Use",
+  ],
+  ar: [
+    "أضف",
+    "أدرج",
+    "استبدل",
+    "استخدم",
+    "حدد",
+    "اذكر",
+    "رتب",
+    "انقل",
+    "احذف",
+    "اختصر",
+    "نسّق",
+    "وضّح",
+    "قِس",
+    "أبرز",
+  ],
+  fr: [
+    "Ajoutez",
+    "Incluez",
+    "Inscrivez",
+    "Mentionnez",
+    "Soulignez",
+    "Remplacez",
+    "Quantifiez",
+    "Déplacez",
+    "Supprimez",
+    "Précisez",
+    "Clarifiez",
+    "Réduisez",
+    "Raccourcissez",
+    "Adaptez",
+    "Organisez",
+    "Complétez",
+  ],
+  es: [
+    "Añade",
+    "Agrega",
+    "Incluye",
+    "Incorpora",
+    "Menciona",
+    "Destaca",
+    "Especifica",
+    "Sustituye",
+    "Cuantifica",
+    "Mueve",
+    "Elimina",
+    "Reduce",
+    "Acorta",
+    "Organiza",
+    "Completa",
+    "Aclara",
+  ],
+  de: [
+    "Füge",
+    "Ergänze",
+    "Nennen",
+    "Ersetze",
+    "Quantifiziere",
+    "Reduziere",
+    "Ordne",
+    "Liste",
+    "Benenne",
+    "Formatiere",
+    "Verschiebe",
+    "Entferne",
+    "Kürze",
+    "Überarbeite",
+    "Gliedere",
+    "Angleiche",
+  ],
+} as const;
+
 function hasActionWord(normalizedIssue: string): boolean {
   const hasLatinAction = ACTION_WORDS.some((word) => {
     const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -300,6 +411,41 @@ export function validateAtsScoreResult(value: unknown): AtsScoreResult | null {
   );
 
   return { ...parsed.data, score: weightedScore };
+}
+
+/**
+ * Returns a content-free failure code for safe server diagnostics. Never log
+ * model-generated issue text, which can quote user-provided resume content.
+ */
+export function getAtsScoreValidationFailure(value: unknown): string | null {
+  const parsed = strictAtsScoreSchema.safeParse(value);
+  if (!parsed.success) return "schema_validation_failed";
+
+  const expected = new Map(
+    ATS_CATEGORIES.map((category) => [
+      category.id,
+      { label: category.label, weight: category.weight },
+    ]),
+  );
+  const seen = new Set<string>();
+
+  for (const category of parsed.data.categories) {
+    const definition = expected.get(category.id);
+    if (!definition) return "unknown_category";
+    if (seen.has(category.id)) return "duplicate_category";
+    if (
+      category.label !== definition.label ||
+      category.weight !== definition.weight
+    ) {
+      return `category_metadata_mismatch:${category.id}`;
+    }
+    if (!hasSpecificActionableIssue(category.issues)) {
+      return `non_actionable_issue:${category.id}`;
+    }
+    seen.add(category.id);
+  }
+
+  return seen.size === ATS_CATEGORIES.length ? null : "missing_category";
 }
 
 /** Valid, explicit fallback; the UI localizes its copy and labels it as a fallback. */
