@@ -114,53 +114,108 @@ export const ATS_GEMINI_RESPONSE_SCHEMA: ResponseSchema = {
 export type AtsScoreResult = z.infer<typeof strictAtsScoreSchema>;
 
 const GENERIC_ISSUES = [
-  /^improve (your )?resume\.?$/i,
-  /^make (your )?resume better\.?$/i,
-  /^add more details\.?$/i,
-  /^use action verbs\.?$/i,
-  /^add more keywords\.?$/i,
+  /\bimprove (your )?resume\b/i,
+  /\bmake (your )?resume better\b/i,
+  /\badd more details\b/i,
+  /\buse action verbs\b/i,
+  /\badd more keywords\b/i,
 ];
 
 const ACTION_WORDS = [
   "add",
+  "added",
   "adding",
   "include",
+  "included",
   "including",
+  "insert",
+  "mention",
+  "highlight",
   "replace",
   "quantify",
-  "quantify",
+  "quantified",
   "move",
   "remove",
   "rewrite",
   "specify",
+  "clarify",
+  "state",
+  "list",
   "name",
+  "define",
+  "create",
+  "organize",
+  "separate",
+  "split",
+  "combine",
+  "reduce",
+  "trim",
+  "condense",
+  "cut",
+  "format",
+  "reformat",
   "tailor",
   "reorder",
   "shorten",
   "expand",
+  "align",
+  "measure",
+  "demonstrate",
+  "provide",
+  "use",
+  "ajouter",
   "ajoutez",
+  "mentionnez",
+  "indiquez",
+  "soulignez",
   "incluez",
+  "inscrivez",
   "remplacez",
   "quantifiez",
+  "clarifiez",
+  "raccourcissez",
+  "réduisez",
   "déplacez",
   "supprimez",
   "précisez",
   "adaptez",
+  "organisez",
+  "complétez",
   "añade",
   "agrega",
   "incluye",
+  "incorpora",
+  "menciona",
+  "destaca",
+  "especifica",
   "sustituye",
   "cuantifica",
   "mueve",
   "elimina",
-  "concreta",
+  "reduce",
+  "acorta",
+  "organiza",
+  "completa",
+  "aclara",
   "füge",
   "ergänze",
+  "nennen",
   "ersetze",
   "quantifiziere",
+  "reduziere",
+  "ordne",
+  "liste",
+  "benenne",
+  "formatiere",
   "verschiebe",
   "entferne",
   "kürze",
+  "überarbeite",
+  "gliedere",
+  "angleiche",
+];
+
+const ARABIC_ACTION_WORDS = [
   "أضف",
   "أدرج",
   "استبدل",
@@ -174,14 +229,31 @@ const ACTION_WORDS = [
   "اختصر",
   "وسع",
   "وسّع",
+  "نسّق",
+  "وضّح",
+  "قِس",
+  "أبرز",
 ];
+
+function hasActionWord(normalizedIssue: string): boolean {
+  const hasLatinAction = ACTION_WORDS.some((word) => {
+    const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`(?:^|[^\\p{L}])${escaped}(?=$|[^\\p{L}])`, "iu").test(
+      normalizedIssue,
+    );
+  });
+  return (
+    hasLatinAction ||
+    ARABIC_ACTION_WORDS.some((word) => normalizedIssue.includes(word))
+  );
+}
 
 function hasSpecificActionableIssue(issues: string[]): boolean {
   return issues.some((issue) => {
-    const normalized = issue.trim().toLocaleLowerCase();
+    const normalized = issue.trim().toLowerCase();
     return (
-      normalized.length >= 35 &&
-      ACTION_WORDS.some((word) => normalized.includes(word)) &&
+      normalized.length >= 25 &&
+      hasActionWord(normalized) &&
       !GENERIC_ISSUES.some((pattern) => pattern.test(normalized))
     );
   });

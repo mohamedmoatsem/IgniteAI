@@ -22,6 +22,10 @@ import {
   createAtsScoreFallback,
   validateAtsScoreResult,
 } from "../lib/ats-score";
+import {
+  extractResumeText,
+  ResumeTextExtractionError,
+} from "../lib/resume-text";
 
 const router: IRouter = Router();
 
@@ -40,16 +44,6 @@ const upload = multer({
     callback(null, true);
   },
 });
-
-/** Extract text from an uploaded resume buffer (PDF/text/markdown). */
-function extractResumeText(buffer: Buffer, filename: string): string {
-  // For text-based formats (txt, md, docx text layer), decode as UTF-8.
-  // PDF binary text extraction is best-effort without a heavy library.
-  const text = buffer.toString("utf-8");
-  // Remove null bytes and control chars that indicate non-text binary
-  const cleaned = text.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, " ").trim();
-  return cleaned.length > 50 ? cleaned : `[Resume file: ${filename}]`;
-}
 
 /** Strip sourceText before returning over the API. */
 function toApiResume(r: typeof resumesTable.$inferSelect) {
@@ -94,7 +88,28 @@ router.post(
       return;
     }
 
-    const sourceText = extractResumeText(req.file.buffer, req.file.originalname);
+    let sourceText: string;
+    try {
+      sourceText = await extractResumeText(
+        req.file.buffer,
+        req.file.originalname,
+      );
+    } catch (err) {
+      if (err instanceof ResumeTextExtractionError) {
+        req.log.warn(
+          { statusCode: err.statusCode },
+          "Resume text extraction failed",
+        );
+        res.status(err.statusCode).json({
+          error:
+            "Could not read resume text. Upload a text-based PDF or Word document, or paste the resume text.",
+        });
+        return;
+      }
+      req.log.error({ err }, "Resume text extraction failed");
+      res.status(500).json({ error: "Failed to extract resume text" });
+      return;
+    }
     const country =
       typeof req.body?.country === "string" ? req.body.country.trim() : undefined;
     const remote =
@@ -250,7 +265,7 @@ router.post("/career/ats-score", async (req, res): Promise<void> => {
     "Return ONLY valid JSON matching the supplied response schema. Do not include markdown fences, commentary, or extra properties.",
     `Use exactly these five categories, each exactly once, with the exact label and weight shown:\n${categoryInstructions}`,
     "Give each category a score from 0 to 100. The overall score must be the rounded weighted average using the listed weights.",
-    "Every category must contain at least one specific, actionable issue grounded in the supplied resume or job description. Cite a concrete missing keyword, section, formatting signal, weak bullet, missing metric, or length/readability concern. Never use generic advice such as 'improve your resume'.",
+    "Every category must contain at least one specific, actionable issue grounded in the supplied resume or job description. Phrase at least one issue per category as a concrete change instruction beginning with an action verb (for example: Add, Include, Move, Rewrite, Quantify, Shorten, or the equivalent in the output language). Cite a concrete keyword, section, formatting signal, weak bullet, missing metric, or length/readability concern. Never use generic advice such as 'improve your resume'.",
     "Provide 3 to 5 prioritized, concrete fixes. Do not invent credentials, experience, metrics, or resume details.",
     `Write issues and topFixes in ${outputLanguage}; keep the required category labels in English exactly as provided.`,
   ].join(" ");

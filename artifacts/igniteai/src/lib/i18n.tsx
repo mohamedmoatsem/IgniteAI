@@ -70,6 +70,9 @@ type TranslationKey =
   | "career.remote"
   | "career.uploadResume"
   | "career.uploadHint"
+  | "career.uploadReadError"
+  | "career.uploadTooLarge"
+  | "career.uploadProcessError"
   | "career.skills"
   | "career.experience"
   | "career.jobApplications"
@@ -179,6 +182,9 @@ const en: Translations = {
   "career.remote": "Open to remote",
   "career.uploadResume": "Upload resume",
   "career.uploadHint": "PDF, Word, or text file",
+  "career.uploadReadError": "Couldn't read text from this file. Scanned/image-only PDFs require OCR; try a text-based PDF, Word file, or paste the resume text.",
+  "career.uploadTooLarge": "This file is too large to extract safely. Upload a smaller document.",
+  "career.uploadProcessError": "We couldn't upload or process this resume. Please try again.",
   "career.skills": "Skills",
   "career.experience": "Experience",
   "career.jobApplications": "Job Applications",
@@ -287,6 +293,9 @@ const ar: Translations = {
   "career.remote": "منفتح على العمل عن بُعد",
   "career.uploadResume": "رفع السيرة الذاتية",
   "career.uploadHint": "PDF أو Word أو ملف نصي",
+  "career.uploadReadError": "تعذرت قراءة نص من هذا الملف. ملفات PDF الممسوحة ضوئيًا أو التي تحتوي صورًا فقط تحتاج إلى OCR؛ جرّب PDF نصيًا أو ملف Word أو الصق نص السيرة الذاتية.",
+  "career.uploadTooLarge": "الملف كبير جدًا لاستخراج النص بأمان. ارفع مستندًا أصغر.",
+  "career.uploadProcessError": "تعذّر رفع السيرة الذاتية أو معالجتها. حاول مرة أخرى.",
   "career.skills": "المهارات",
   "career.experience": "الخبرة",
   "career.jobApplications": "طلبات التوظيف",
@@ -395,6 +404,9 @@ const fr: Translations = {
   "career.remote": "Ouvert au télétravail",
   "career.uploadResume": "Importer le CV",
   "career.uploadHint": "PDF, Word ou fichier texte",
+  "career.uploadReadError": "Impossible de lire le texte de ce fichier. Les PDF numérisés ou composés uniquement d'images nécessitent l'OCR ; essayez un PDF textuel, un fichier Word ou collez le texte du CV.",
+  "career.uploadTooLarge": "Ce fichier est trop volumineux pour une extraction sûre. Importez un document plus petit.",
+  "career.uploadProcessError": "Impossible d'importer ou de traiter ce CV. Veuillez réessayer.",
   "career.skills": "Compétences",
   "career.experience": "Expérience",
   "career.jobApplications": "Candidatures",
@@ -503,6 +515,9 @@ const es: Translations = {
   "career.remote": "Abierto al trabajo remoto",
   "career.uploadResume": "Subir CV",
   "career.uploadHint": "PDF, Word o archivo de texto",
+  "career.uploadReadError": "No se pudo leer el texto del archivo. Los PDF escaneados o compuestos solo por imágenes requieren OCR; prueba con un PDF de texto, un archivo Word o pega el texto del CV.",
+  "career.uploadTooLarge": "El archivo es demasiado grande para extraerlo de forma segura. Sube un documento más pequeño.",
+  "career.uploadProcessError": "No se pudo subir o procesar el CV. Inténtalo de nuevo.",
   "career.skills": "Habilidades",
   "career.experience": "Experiencia",
   "career.jobApplications": "Solicitudes de empleo",
@@ -611,6 +626,9 @@ const de: Translations = {
   "career.remote": "Offen für Remote-Arbeit",
   "career.uploadResume": "Lebenslauf hochladen",
   "career.uploadHint": "PDF, Word oder Textdatei",
+  "career.uploadReadError": "Der Text dieser Datei konnte nicht gelesen werden. Gescannte oder bildbasierte PDFs benötigen OCR; verwende ein textbasiertes PDF, eine Word-Datei oder füge den Lebenslauftext ein.",
+  "career.uploadTooLarge": "Diese Datei ist zu groß für eine sichere Textextraktion. Lade ein kleineres Dokument hoch.",
+  "career.uploadProcessError": "Der Lebenslauf konnte nicht hochgeladen oder verarbeitet werden. Bitte erneut versuchen.",
   "career.skills": "Fähigkeiten",
   "career.experience": "Erfahrung",
   "career.jobApplications": "Bewerbungen",

@@ -195,6 +195,17 @@ export default function CareerCatalyst() {
               <p className="text-sm font-medium">{t("career.uploadResume")}</p>
               <p className="text-xs text-muted-foreground">{t("career.uploadHint")}</p>
             </div>
+            {uploadResume.isError && (
+              <p className="text-sm text-destructive" role="alert">
+                {t(
+                  uploadResume.error.status === 413
+                    ? "career.uploadTooLarge"
+                    : uploadResume.error.status === 422
+                      ? "career.uploadReadError"
+                      : "career.uploadProcessError",
+                )}
+              </p>
+            )}
 
             {/* Resume list */}
             {isLoadingResumes
