@@ -1,105 +1,76 @@
-# 🚀 IgniteAI — Multi-Agent Developer, Career & Content Accelerator
+![Tests Passing](https://img.shields.io/badge/tests-passing-brightgreen)
 
-> **Empowering Developers, Founders, and Creators to Build Applications, Master Skills, and Launch AI-Powered Content Effortlessly.**
+# IgniteAI
 
-IgniteAI is a unified, multi-agent SaaS platform designed to streamline full-stack application creation, code debugging, asset generation, career alignment, and automated skill-to-video learning—fully localized for global markets with native RTL and dynamic i18n support.
+IgniteAI is an AI-assisted workspace for developers and job seekers. It combines idea planning, code assistance, file transformation, and career tools in a localized React and TypeScript application backed by a Node.js API.
 
----
+## Product modules
 
-## 🌟 Key Features & Core Modules
+IgniteAI has four primary workspaces and five core capabilities. ATS Score is the fifth capability and is presented inside Career Catalyst rather than as a separate navigation screen.
 
-IgniteAI integrates five core AI-powered modules into a single, cohesive ecosystem:
+1. **JumpStart** — turns an idea into a structured project board and can run a Research → Coder → QA multi-agent workflow.
+2. **LiveLab** — provides AI-assisted code explanations and development support.
+3. **Asset Reviver** — extracts and transforms supported documents and spreadsheets into useful content.
+4. **Career Catalyst** — parses uploaded resumes, creates targeted career materials, and tracks job applications.
+5. **ATS Score** — compares resume text with a job description and reports a weighted score, category breakdown, and specific fixes.
 
-### 1. ⚡ JumpStart (Idea to Blueprint)
-* Converts raw product ideas into structured, actionable development blueprints instantly.
-* Generates clear task boards (Kanban), tech stack recommendations, and execution timelines.
-* Designed with clean UI component hierarchies to prevent state conflicts and ensure smooth board interactions.
+Career Catalyst can also use the project portfolio context in DataHub, including Aman (Gemma-powered crisis psychological support), SyncSolar Systems (solar SCADA monitoring), and Namaa (AI-agent smart agriculture).
 
-### 2. 🧪 LiveLab (Real-Time Code & Debugging)
-* AI-driven code explainers and live refactoring suite powered by Google Gemini models.
-* Built-in Pomodoro productivity timer to keep developers focused during execution sessions.
-* Real-time snippet analysis with syntax feedback and safety checks.
+## System architecture
 
-### 3. 🎨 Asset Reviver (Smart Content Transformation)
-* File ingestion engine supporting `.csv`, `.xlsx`, `.pdf`, `.txt`, and `.md`.
-* Automatically extracts and repurposes legacy content into marketing copy, documentation, or digital books.
-* Streamlined background processing with visual status badges.
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS, and Radix UI.
+- **API:** Node.js, Express, and TypeScript, organized as a separate workspace service.
+- **AI:** Google Gemini through the server-side `@google/generative-ai` client. The browser does not receive the API key.
+- **Contracts and data:** shared Zod/OpenAPI packages, PostgreSQL, and Drizzle ORM.
+- **Resume extraction:** `pdftotext` for PDF, `antiword` for legacy DOC, `unzip` for DOCX, plus native text/Markdown reading.
+- **Localization:** English, Arabic, French, Spanish, and German, including right-to-left Arabic presentation.
 
-### 4. 💼 Career Catalyst (Context-Aware Job Matching)
-* ATS-friendly resume parsing paired with targeted Cover Letter generation.
-* **Unified DataHub Context Integration:** Dynamically injects verified real-world project portfolios—such as *Aman* (Crisis Psychological First Aid), *SyncSolar Systems* (IoT SCADA Monitoring), and *Namaa* (Smart Agriculture Ecosystem)—into generated job applications for hyper-personalized credibility.
-* Built-in Kanban application tracker to manage candidate pipeline states seamlessly.
+## System Architect
 
-### 5. 🎓 EduPulse & YouTube AutoCreator Agent (EdTech & Automation)
-* **Autonomous Learning Roadmaps:** Transforms any study topic or technical field into a structured, step-by-step learning path.
-* **YouTube Knowledge Retrieval:** Queries the YouTube API to dynamically fetch, rank, and embed the highest-rated video tutorials for each specific roadmap unit.
-* **Faceless Video Creation Engine:** Synthesizes generated lesson notes into YouTube Shorts/Video scripts, SEO-optimized titles, tags, and visual scene prompts for automated channel monetization.
+**Mohamed Moatsem — System Architect**
 
----
+The architecture emphasizes clear boundaries between the UI, API, AI calls, and data contracts. The System Architect contribution includes:
 
-## 🌐 Full i18n & RTL Support
+- Designing the Research → Coder → QA agent workflow.
+- Structuring prompts and strict JSON response validation for AI features.
+- Keeping Gemini credentials on the server and isolating external AI calls behind a shared client.
+- Adding quota-free unit tests that mock Gemini responses while exercising ATS validation and real PDF/DOCX/text extraction.
 
-* **Multi-Language Engine:** Built-in dynamic localization supporting **English, Arabic, French, Spanish, and German**.
-* **First-Class RTL Layouts:** Complete bidirectional layout enforcement (`dir="rtl"`, mirrored margins/paddings, and auto text-alignment) tailored for seamless Arabic UI rendering.
-* **Mobile Responsive Drawer:** Collapsible hamburger drawer navigation providing 100% usable canvas area on mobile viewports.
+## Development setup
 
----
+### Requirements
 
-## 🏗️ Technical Architecture & DataHub Integration
+- Node.js 24
+- pnpm 10.26.1
+- For PDF/DOC/DOCX resume extraction outside Replit: Poppler (`pdftotext`), `antiword`, and `unzip`.
 
-┌──────────────────────────┐
-│ User Inputs / Resumes    │
-└────────────┬─────────────┘
-│
-▼
-┌──────────────────────────┐   ┌──────────────────────────┐   ┌──────────────────────────┐
-│ Unified DataHub Context  │──►│ Multi-Agent Gemini Engine│◄──│ i18n & RTL Middleware    │
-│ (Aman, SyncSolar, Namaa) │   └────────────┬─────────────┘   └──────────────────────────┘
-└──────────────────────────┘                │
-▼
-┌──────────────────────────┐
-│ Code, Blueprints, Career │
-│   & YouTube Automation   │
-└──────────────────────────┘
+The root manifest pins pnpm. Enable Corepack and install the pinned version if needed:
 
-### Multi-Tenancy & Privacy Standard
-IgniteAI employs a **Multi-Tenant User Isolation Model**:
-* All project data, uploaded resumes, and user records are tightly scoped to the individual `userId`.
-* **DataHub Privacy:** Pre-seeded project profiles serve as demonstration context for new user sessions. Once a user creates or links their own projects, private user records isolate and override demo data completely.
+```bash
+corepack enable
+corepack prepare pnpm@10.26.1 --activate
+pnpm install --frozen-lockfile
+```
 
----
+Configure `GEMINI_API_KEY` as a Replit Secret. The API also needs the project database environment configured. Do not commit credentials or put them in frontend variables. Replit workflows supply each service's `PORT` and `BASE_PATH`.
 
-## 💰 Monetization & Business Model
+Start the project with the Replit **Run** workflow. For local development, run the API and web services in separate terminals with the environment required by their artifact configuration:
 
-IgniteAI is structured around a highly scalable B2C/B2B hybrid revenue system:
+```bash
+PORT=8080 pnpm --filter @workspace/api-server run dev
+PORT=24115 BASE_PATH=/ pnpm --filter @workspace/igniteai run dev
+```
 
-* **Freemium Plan (Starter):** Free access to basic JumpStart blueprints, limited daily LiveLab executions, and standard application tracking.
-* **Pro Developer & Creator ($19/month):** Unlimited multi-agent invocations, priority Gemini API throughput, extended Asset Reviver file limits, deep DataHub context injections, and full YouTube script/automation exports.
-* **Enterprise & Institutional Tier:** Custom deployment for universities, coding bootcamps, and corporate teams requiring dedicated privacy pipelines, custom LLM fine-tuning, and team analytics.
+## Quality checks
 
----
+```bash
+pnpm test
+pnpm run typecheck
+pnpm run build
+```
 
-## 🛠️ Tech Stack
+The automated tests use mocked Gemini responses and make no external AI requests. The build command runs typechecking and builds the API, IgniteAI web app, and component preview service with their configured environment values.
 
-* **Frontend:** React, TypeScript, Tailwind CSS, Lucide Icons, Radix UI.
-* **AI & Intelligence Engine:** Google Gemini API (Multi-Agent Workflows).
-* **Integrations:** YouTube Data API v3 (Educational Video Linking).
-* **Internationalization:** Custom lightweight i18n framework with full RTL support.
-* **Deployment & Environment:** Replit, Node.js API Server.
+## Current scope
 
----
-
-## 🚀 Getting Started
-
-1. **Clone the Repository:**
-   ```bash
-   git clone [https://github.com/your-username/ignite-ai.git](https://github.com/your-username/ignite-ai.git)
-   cd ignite-ai
-   2.Install Dependencies:
-   npm install
-3.Configure Environment Variables:
-Create a .env file in the root directory and set your API keys:
-GEMINI_API_KEY=your_gemini_api_key_here
-YOUTUBE_API_KEY=your_youtube_api_key_here
-4.Run Development Server:
-npm run dev
+Authentication and per-user ATS scan history are not enabled yet. Resume processing and ATS scoring are available for the current session; real account-based history is deferred until authentication is integrated.
